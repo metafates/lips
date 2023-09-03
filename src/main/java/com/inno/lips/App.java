@@ -3,22 +3,29 @@ package com.inno.lips;
 import com.inno.lips.core.lexer.Lexer;
 import com.inno.lips.core.lexer.LexingException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * Hello world!
  */
 public class App {
     public static void main(String[] args) {
-        final String input = """
-                (print "some string" true)
-                """;
-        try {
-            var tokens = Lexer.tokenize(input);
+        var reader = new BufferedReader(new InputStreamReader(System.in));
 
-            for (var token : tokens) {
-                System.out.println(token);
+        while (true) {
+            try {
+                var tokens = Lexer.tokenize(reader.readLine());
+
+                for (var token : tokens) {
+                    System.out.println(token);
+                }
+            } catch (LexingException e) {
+                System.out.println(e.pretty());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (LexingException e) {
-            System.out.println(e.pretty(input));
         }
     }
 }

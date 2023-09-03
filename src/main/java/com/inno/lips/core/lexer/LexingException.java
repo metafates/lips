@@ -31,7 +31,7 @@ public class LexingException extends Exception {
         return "%s %s".formatted(getMessage(), span);
     }
 
-    public String pretty(String source) {
+    public String pretty() {
         var lines = source.split("\n");
 
         var start = getLineNumberForIndex(source, span.getStart());
