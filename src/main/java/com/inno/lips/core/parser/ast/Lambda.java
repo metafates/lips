@@ -16,32 +16,32 @@ public class Lambda extends Expression {
         this.syntaxObject = syntaxObject;
     }
 
-    public static Lambda parse(Atom atom, List<Expression> value) throws ParseException {
+    public static Lambda parse(List<Expression> value) throws ParseException {
         if (value.size() != 3) {
             // TODO
-            throw new ParseException("lambda expects list if arguments and body");
+            throw new ParseException("lambda expect list of arguments and body");
         }
 
-        return switch (value.get(1)) {
-            case com.inno.lips.core.parser.ast.List list -> {
-                List<Atom> arguments = new ArrayList<>();
+        if (!(value.get(1) instanceof com.inno.lips.core.parser.ast.List list)) {
+            throw new ParseException("lambda expects list of arguments"); // todo
+        }
 
-                // check that all arguments are atoms
-                for (Expression argument : list.getArguments()) {
-                    if (!(argument instanceof Atom)) {
-                        // TODO
-                        throw new ParseException("lambda expects atoms as arguments");
-                    }
+        List<Atom> arguments = new ArrayList<>();
 
-                    arguments.add((Atom) argument);
-                }
-
-                var body = value.get(2);
-
-                yield new Lambda(arguments, body, atom.getSyntaxObject());
+        // check that all arguments are atoms
+        for (Expression argument : list.getArguments()) {
+            if (!(argument instanceof Atom atom)) {
+                // TODO
+                throw new ParseException("lambda expects atoms as arguments");
             }
-            default -> throw new ParseException("lambda expects list of arguments"); // todo
-        };
+
+            arguments.add(atom);
+        }
+
+        var body = value.get(2);
+        var atom = (Atom) value.get(0);
+
+        return new Lambda(arguments, body, atom.getSyntaxObject());
     }
 
     @Override

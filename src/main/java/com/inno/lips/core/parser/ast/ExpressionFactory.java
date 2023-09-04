@@ -8,12 +8,13 @@ public class ExpressionFactory {
             return new List();
         }
 
-        return switch (value.get(0)) {
-            case Atom atom -> switch (atom.getSyntaxObject().getToken().type()) {
-                case SET -> Set.parse(atom, value);
-                case LAMBDA -> Lambda.parse(atom, value);
-                default -> new List(value);
-            };
+        if (!(value.get(0) instanceof Atom atom)) {
+            return new List(value);
+        }
+
+        return switch (atom.getSyntaxObject().getToken().type()) {
+            case SET -> Set.parse(value);
+            case LAMBDA -> Lambda.parse(value);
             default -> new List(value);
         };
     }

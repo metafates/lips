@@ -17,12 +17,13 @@ public class Set extends Expression {
         this.syntaxObject = syntaxObject;
     }
 
-    public static Set parse(Atom atom, List<Expression> value) throws ParseException {
+    public static Set parse(List<Expression> value) throws ParseException {
         if (value.size() != 3) {
             // TODO
             throw new ParseException("set expects identifier and expression");
         }
 
+        var atom = (Atom) value.get(0);
         var identifier = (Atom) value.get(1);
         var expression = value.get(2);
 

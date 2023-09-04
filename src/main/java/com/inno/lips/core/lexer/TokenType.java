@@ -11,6 +11,7 @@ public enum TokenType {
     CLOSE_PAREN(")"),
     SET("set"),
     LAMBDA("lambda"),
+    FUNC("func"),
     COMMENT(compile(";[^\n]*")),
     BOOLEAN_LITERAL(compile("false|true")),
     NUMBER_LITERAL(compile("[+-]?\\d+(\\.\\d*)?")),
