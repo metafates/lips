@@ -39,7 +39,13 @@ public class Evaluator {
             }
 
             var values = new ArrayList<Element>();
-            arguments.forEachRemaining(values::add);
+            // HERE EVALLUATE TODO
+
+            while (arguments.hasNext()) {
+                var argument = arguments.next();
+
+                values.add(evaluate(argument, scope.inner()).orElseThrow());
+            }
 
             return procedure.call(values);
         }

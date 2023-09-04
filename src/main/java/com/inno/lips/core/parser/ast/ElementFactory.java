@@ -15,6 +15,7 @@ public class ElementFactory {
         return switch (atom.getSyntaxObject().token().type()) {
             case SET -> Set.parse(value);
             case LAMBDA -> Lambda.parse(value);
+            case COND -> Cond.parse(value);
             default -> new List(value);
         };
     }

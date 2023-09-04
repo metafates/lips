@@ -19,7 +19,7 @@ public class Lambda extends Atom {
 
     public static Lambda parse(List<Element> value) throws ParseException {
         if (value.size() != 3) {
-            System.out.println(value.size());
+            System.out.println(value);
             throw new InvalidSyntaxException("lambda expects list of arguments and body");
         }
 

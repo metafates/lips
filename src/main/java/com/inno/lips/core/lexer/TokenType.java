@@ -13,13 +13,14 @@ public enum TokenType {
     LAMBDA("lambda"),
     FUNC("func"),
     NIL("nil"),
+    COND("cond"),
     COMMENT(compile(";[^\n]*")),
     BOOLEAN_LITERAL(compile("false|true")),
     NUMBER_LITERAL(compile("[+-]?\\d+(\\.\\d*)?")),
     BLANK(compile("\\s")),
     QUOTE_TICK(compile("'")),
     STRING_LITERAL(compile("\"([^\"\\\\]|\\\\t|\\\\u|\\\\n|\\\\r|\\\\\")*\"")),
-    IDENTIFIER(compile("[A-Za-z+\\-.][A-Za-z\\d\\-.]*")); // TODO
+    IDENTIFIER(compile("[A-Za-z+\\-.><?][A-Za-z\\d\\-.><?]*")); // TODO
 
 
     private final Pattern pattern;
