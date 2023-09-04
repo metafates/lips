@@ -11,7 +11,7 @@ public class Lexer {
     }
 
     public static List<Token> tokenize(String input) throws LexingException {
-        return new Lexer(input).tokenize().stream().filter(token -> switch (token.getType()) {
+        return new Lexer(input).tokenize().stream().filter(token -> switch (token.type()) {
             case COMMENT, BLANK -> false;
             default -> true;
         }).toList();
@@ -54,7 +54,7 @@ public class Lexer {
         }
 
         if (!window.isEmpty()) {
-            throw new UnexpectedEOF(new Span(windowStart, chars.length), input);
+            throw new UnexpectedEOFException(new Span(windowStart, chars.length), input);
         }
 
         return tokens;
