@@ -1,10 +1,6 @@
 package com.inno.lips.core.parser.ast;
 
-import com.inno.lips.core.lexer.TokenType;
-
-import java.util.Optional;
-
-public class Atom extends Expression {
+public class Atom extends Element {
     private final SyntaxObject syntaxObject;
 
     public Atom(SyntaxObject syntaxObject) {
@@ -16,16 +12,8 @@ public class Atom extends Expression {
         return syntaxObject;
     }
 
-    public Optional<String> identifier() {
-        if (syntaxObject.getToken().type() == TokenType.IDENTIFIER) {
-            return Optional.of(syntaxObject.getToken().source());
-        }
-
-        return Optional.empty();
-    }
-
     @Override
     public String toString() {
-        return syntaxObject.toString();
+        return "Atom(%s)".formatted(syntaxObject.toString());
     }
 }

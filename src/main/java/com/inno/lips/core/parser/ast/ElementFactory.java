@@ -2,8 +2,8 @@ package com.inno.lips.core.parser.ast;
 
 import com.inno.lips.core.parser.ParseException;
 
-public class ExpressionFactory {
-    public static Expression create(java.util.List<Expression> value) throws ParseException {
+public class ElementFactory {
+    public static Element create(java.util.List<Element> value) throws ParseException {
         if (value.isEmpty()) {
             return new List();
         }
@@ -12,7 +12,7 @@ public class ExpressionFactory {
             return new List(value);
         }
 
-        return switch (atom.getSyntaxObject().getToken().type()) {
+        return switch (atom.getSyntaxObject().token().type()) {
             case SET -> Set.parse(value);
             case LAMBDA -> Lambda.parse(value);
             default -> new List(value);

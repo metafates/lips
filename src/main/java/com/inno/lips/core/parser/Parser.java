@@ -1,12 +1,7 @@
 package com.inno.lips.core.parser;
 
-import com.inno.lips.core.lexer.Lexer;
-import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
-import com.inno.lips.core.parser.ast.Atom;
-import com.inno.lips.core.parser.ast.Expression;
-import com.inno.lips.core.parser.ast.ExpressionFactory;
-import com.inno.lips.core.parser.ast.SyntaxObject;
+import com.inno.lips.core.parser.ast.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -20,17 +15,13 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public static Expression parse(String input) throws ParseException, LexingException {
-        return new Parser(Lexer.tokenize(input)).parse();
-    }
-
-    public static Expression parse(List<Token> tokens) throws ParseException {
+    public static Element parse(List<Token> tokens) throws ParseException {
         return new Parser(tokens).parse();
     }
 
-    private Expression parse() throws ParseException {
-        Deque<List<Expression>> stack = new ArrayDeque<>();
-        List<Expression> frame = new ArrayList<>();
+    private Element parse() throws ParseException {
+        Deque<List<Element>> stack = new ArrayDeque<>();
+        List<Element> frame = new ArrayList<>();
 
         for (var token : tokens) {
             switch (token.type()) {
@@ -44,10 +35,20 @@ public class Parser {
                     }
 
                     var previousFrame = stack.pop();
-                    previousFrame.add(ExpressionFactory.create(frame));
+                    previousFrame.add(ElementFactory.create(frame));
                     frame = previousFrame;
                 }
-                default -> frame.add(new Atom(new SyntaxObject(token)));
+                default -> {
+                    Atom element = switch (token.type()) {
+                        case IDENTIFIER -> new Symbol(new SyntaxObject(token));
+                        case STRING_LITERAL -> new StringLiteral(new SyntaxObject(token));
+                        case BOOLEAN_LITERAL -> new BooleanLiteral(new SyntaxObject(token));
+                        case NUMBER_LITERAL -> new NumberLiteral(new SyntaxObject(token));
+                        default -> new Atom(new SyntaxObject(token));
+                    };
+
+                    frame.add(element);
+                }
             }
         }
 
@@ -55,6 +56,6 @@ public class Parser {
             throw new UnexpectedEOFException();
         }
 
-        return ExpressionFactory.create(frame);
+        return ElementFactory.create(frame);
     }
 }

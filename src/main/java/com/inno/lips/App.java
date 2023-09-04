@@ -1,11 +1,15 @@
 package com.inno.lips;
 
+import com.inno.lips.core.evaluator.Builtin;
+import com.inno.lips.core.evaluator.Evaluator;
+import com.inno.lips.core.evaluator.RuntimeException;
+import com.inno.lips.core.evaluator.Scope;
 import com.inno.lips.core.lexer.Lexer;
 import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.Parser;
-import com.inno.lips.core.parser.ast.Expression;
+import com.inno.lips.core.parser.ast.Element;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +23,7 @@ public class App {
     public static void main(String[] args) {
         var reader = new BufferedReader(new InputStreamReader(System.in));
 
+        Scope scope = Builtin.create();
         while (true) {
             try {
                 List<Token> tokens = Lexer.tokenize(reader.readLine());
@@ -27,15 +32,26 @@ public class App {
                     System.out.println(token);
                 }
 
-                Expression expression = Parser.parse(tokens);
+                Element element = Parser.parse(tokens);
 
-                System.out.println(expression);
+                System.out.println(element);
+
+                var list = (com.inno.lips.core.parser.ast.List) element;
+                var items = list.getArguments();
+
+                for (var item : items) {
+                    var result = Evaluator.evaluate(item, scope);
+                    System.out.println(result);
+                }
+
             } catch (LexingException e) {
                 System.err.println(e.pretty());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             } catch (ParseException e) {
                 System.out.println(e.getMessage());
+            } catch (RuntimeException e) {
+                System.out.printf(e.getMessage());
+            } catch (IOException e) {
+                throw new java.lang.RuntimeException(e);
             }
         }
     }

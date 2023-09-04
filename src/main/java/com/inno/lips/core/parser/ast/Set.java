@@ -1,37 +1,46 @@
 package com.inno.lips.core.parser.ast;
 
+import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.List;
 
-public class Set extends Expression {
-    private final Atom identifier;
-    private final Expression expression;
-    private final SyntaxObject syntaxObject;
+public class Set extends Atom {
+    private final Symbol symbol;
+    private final Element element;
 
-    public Set(Atom identifier, Expression expression, SyntaxObject syntaxObject) {
-        super();
+    public Set(Symbol symbol, Element element, SyntaxObject syntaxObject) {
+        super(syntaxObject);
 
-        this.identifier = identifier;
-        this.expression = expression;
-        this.syntaxObject = syntaxObject;
+        this.symbol = symbol;
+        this.element = element;
     }
 
-    public static Set parse(List<Expression> value) throws ParseException {
+    public static Set parse(List<Element> value) throws ParseException {
         if (value.size() != 3) {
             // TODO
-            throw new ParseException("set expects identifier and expression");
+            throw new InvalidSyntaxException("set expects identifier and expression");
         }
 
-        var atom = (Atom) value.get(0);
-        var identifier = (Atom) value.get(1);
+        if (!(value.get(1) instanceof Atom atom)) {
+            throw new InvalidSyntaxException("set expects identifier");
+        }
+
         var expression = value.get(2);
 
-        return new Set(identifier, expression, atom.getSyntaxObject());
+        return new Set(new Symbol(atom), expression, atom.getSyntaxObject());
+    }
+
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public Element getElement() {
+        return element;
     }
 
     @Override
     public String toString() {
-        return "set %s %s".formatted(identifier, expression);
+        return "set %s %s".formatted(symbol, element);
     }
 }

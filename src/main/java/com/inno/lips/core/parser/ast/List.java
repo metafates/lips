@@ -2,10 +2,10 @@ package com.inno.lips.core.parser.ast;
 
 import java.util.ArrayList;
 
-public class List extends Expression {
-    private final java.util.List<Expression> arguments;
+public class List extends Element {
+    private final java.util.List<Element> arguments;
 
-    public List(java.util.List<Expression> arguments) {
+    public List(java.util.List<Element> arguments) {
         this.arguments = arguments;
     }
 
@@ -13,7 +13,7 @@ public class List extends Expression {
         this.arguments = new ArrayList<>();
     }
 
-    public java.util.List<Expression> getArguments() {
+    public java.util.List<Element> getArguments() {
         return arguments;
     }
 

@@ -1,38 +1,38 @@
 package com.inno.lips.core.parser.ast;
 
+import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lambda extends Expression {
-    private final List<Atom> arguments;
-    private final Expression body;
-    private final SyntaxObject syntaxObject;
+public class Lambda extends Atom {
+    private final List<Symbol> arguments;
+    private final Element body;
 
-    public Lambda(List<Atom> arguments, Expression body, SyntaxObject syntaxObject) {
+    public Lambda(List<Symbol> arguments, Element body, SyntaxObject syntaxObject) {
+        super(syntaxObject);
+
         this.arguments = arguments;
         this.body = body;
-        this.syntaxObject = syntaxObject;
     }
 
-    public static Lambda parse(List<Expression> value) throws ParseException {
+    public static Lambda parse(List<Element> value) throws ParseException {
         if (value.size() != 3) {
-            // TODO
-            throw new ParseException("lambda expect list of arguments and body");
+            System.out.println(value.size());
+            throw new InvalidSyntaxException("lambda expects list of arguments and body");
         }
 
         if (!(value.get(1) instanceof com.inno.lips.core.parser.ast.List list)) {
-            throw new ParseException("lambda expects list of arguments"); // todo
+            throw new InvalidSyntaxException("lambda expects list of arguments"); // todo
         }
 
-        List<Atom> arguments = new ArrayList<>();
+        List<Symbol> arguments = new ArrayList<>();
 
         // check that all arguments are atoms
-        for (Expression argument : list.getArguments()) {
-            if (!(argument instanceof Atom atom)) {
-                // TODO
-                throw new ParseException("lambda expects atoms as arguments");
+        for (Element argument : list.getArguments()) {
+            if (!(argument instanceof Symbol atom)) {
+                throw new InvalidSyntaxException("lambda expects atoms as arguments");
             }
 
             arguments.add(atom);
@@ -42,6 +42,14 @@ public class Lambda extends Expression {
         var atom = (Atom) value.get(0);
 
         return new Lambda(arguments, body, atom.getSyntaxObject());
+    }
+
+    public Element getBody() {
+        return body;
+    }
+
+    public List<Symbol> getArguments() {
+        return arguments;
     }
 
     @Override

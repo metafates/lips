@@ -12,6 +12,7 @@ public enum TokenType {
     SET("set"),
     LAMBDA("lambda"),
     FUNC("func"),
+    NIL("nil"),
     COMMENT(compile(";[^\n]*")),
     BOOLEAN_LITERAL(compile("false|true")),
     NUMBER_LITERAL(compile("[+-]?\\d+(\\.\\d*)?")),
