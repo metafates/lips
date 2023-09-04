@@ -10,42 +10,43 @@ public class LexingException extends Exception {
         this.source = source;
     }
 
-    private static int getLineNumberForIndex(String source, int index) {
-        int iLineCount = 1;
-        for (int i = 0; i <= index && i < source.length(); i++) {
-            char c = source.charAt(i);
-            if (c == '\n') {
-                iLineCount++;
-            }
-        }
-
-        return iLineCount;
-    }
-
     public Span getSpan() {
         return span;
     }
 
-    @Override
-    public String toString() {
-        return "%s %s".formatted(getMessage(), span);
-    }
-
     public String pretty() {
-        var lines = source.split("\n");
+        var lines = source.lines().toList();
+        var start = Position.fromIndex(source, span.getStart());
+        var end = Position.fromIndex(source, span.getEnd());
 
-        var start = getLineNumberForIndex(source, span.getStart());
-        var end = getLineNumberForIndex(source, span.getEnd());
-        var diff = end - start;
-
-        var out = new StringBuilder();
-        for (int i = 0; i < diff; i++) {
-            out.append("%d | ".formatted(start + i));
-            out.append(lines[i]);
-            out.append('\n');
+        var builder = new StringBuilder();
+        if (start.line() == end.line()) {
+            builder.append("Error on line ").append(start.line() + 1).append(":");
+            builder.append('\n');
+            builder.append(lines.get(start.line()));
+            builder.append('\n');
+            builder.append(" ".repeat(Math.max(0, start.column())));
+            builder.append("^".repeat(Math.max(0, end.column() - start.column() + 1)));
+            builder.append('\n');
+        } else {
+            builder.append("Error on lines ").append(start.line() + 1).append("-").append(end.line() + 1).append(":");
+            builder.append('\n');
+            builder.append(lines.get(start.line()));
+            builder.append('\n');
+            builder.append(" ".repeat(Math.max(0, start.column())));
+            builder.append("^".repeat(Math.max(0, lines.get(start.line()).length() - start.column())));
+            builder.append('\n');
+            for (int i = start.line() + 1; i < end.line(); i++) {
+                builder.append(lines.get(i));
+                builder.append("^".repeat(lines.get(i).length()));
+                builder.append('\n');
+            }
+            builder.append(lines.get(end.line()));
+            builder.append("^".repeat(Math.max(0, end.column() + 1)));
+            builder.append('\n');
         }
 
-        return out.toString();
+        return "%s\n%s".formatted(builder, getMessage());
     }
 }
 

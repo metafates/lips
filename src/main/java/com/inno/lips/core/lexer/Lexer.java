@@ -18,7 +18,7 @@ public class Lexer {
     }
 
     private List<Token> tokenize() throws LexingException {
-        final var chars = this.input.toCharArray();
+        final var chars = input.toCharArray();
         var window = new StringBuilder();
         var windowStart = 0;
 
@@ -51,6 +51,10 @@ public class Lexer {
 
             windowStart = cursor + 1;
             window.setLength(0);
+        }
+
+        if (!window.isEmpty()) {
+            throw new UnexpectedEOF(new Span(windowStart, chars.length), input);
         }
 
         return tokens;

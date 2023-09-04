@@ -22,7 +22,7 @@ public class App {
                     System.out.println(token);
                 }
             } catch (LexingException e) {
-                System.out.println(e.pretty());
+                System.err.println(e.pretty());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
