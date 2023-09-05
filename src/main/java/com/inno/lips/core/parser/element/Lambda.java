@@ -49,6 +49,14 @@ public final class Lambda extends Atom {
         return new Lambda(parameters, body, atom.getToken());
     }
 
+    public List<Symbol> getParameters() {
+        return parameters;
+    }
+
+    public Element getBody() {
+        return body;
+    }
+
     @Override
     public String toString() {
         return "Lambda(%s, %s)".formatted(parameters, body);

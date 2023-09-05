@@ -37,11 +37,16 @@ public class Parser {
                     frame = previousFrame;
                 }
                 default -> {
+                    if (stack.isEmpty()) {
+                        throw new TopLevelExpressionException();
+                    }
+
                     var element = switch (token.type()) {
                         case IDENTIFIER -> new Symbol(token);
                         case STRING_LITERAL -> StringLiteral.from(token);
                         case BOOLEAN_LITERAL -> BooleanLiteral.from(token);
                         case NUMBER_LITERAL -> NumberLiteral.from(token);
+                        case NIL_LITERAL -> new NilLiteral(token);
                         default -> new Atom(token);
                     };
 
@@ -59,6 +64,7 @@ public class Parser {
         }
 
         // wrap whole tree as a list
-        return new ListNode(frame);
+        return ElementFactory.create(frame);
+//        return new ListNode(frame);
     }
 }

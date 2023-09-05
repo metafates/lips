@@ -18,11 +18,17 @@ public final class Cond extends Atom {
         this.elseExpr = elseExpr;
     }
 
+    public Cond(Element testExpr, Element thenExpr, Token token) {
+        super(token);
+
+        this.testExpr = testExpr;
+        this.thenExpr = thenExpr;
+        this.elseExpr = null;
+    }
+
     public static Cond parse(List<Element> frame) throws ParseException {
-        if (frame.size() != 4) {
-            // TODO
-            System.out.println(frame);
-            throw new ParseException("cond expects 4 elements");
+        if (frame.size() < 3) {
+            throw new ParseException("cond expects 3 or 4 elements");
         }
 
         var iter = frame.iterator();
@@ -31,7 +37,27 @@ public final class Cond extends Atom {
             throw new ParseException("cond keyword expected");
         }
 
-        return new Cond(iter.next(), iter.next(), iter.next(), atom.getToken());
+        var testExpr = iter.next();
+        var thenExpr = iter.next();
+
+        if (iter.hasNext()) {
+            var elseExpr = iter.next();
+            return new Cond(testExpr, thenExpr, elseExpr, atom.getToken());
+        }
+
+        return new Cond(testExpr, thenExpr, atom.getToken());
+    }
+
+    public Element getElseExpr() {
+        return elseExpr;
+    }
+
+    public Element getTestExpr() {
+        return testExpr;
+    }
+
+    public Element getThenExpr() {
+        return thenExpr;
     }
 
     @Override

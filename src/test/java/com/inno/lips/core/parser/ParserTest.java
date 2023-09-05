@@ -27,6 +27,7 @@ public class ParserTest {
         cases.add(new TestCase("()", "List(List())"));
         cases.add(new TestCase("(set a-value \"a string\")", "List(Set(Symbol(a-value), String(a string)))"));
         cases.add(new TestCase("(lambda (a) (+ a a))", "List(Lambda([Symbol(a)], List(Symbol(+), Symbol(a), Symbol(a))))"));
+        cases.add(new TestCase("((lambda (x) (x)) a)", "List(List(Lambda([Symbol(x)], List(Symbol(x))), Symbol(a)))"));
 
         for (TestCase(String source, String expected) : cases) {
             Element parsed = Parser.parse(source);

@@ -12,7 +12,7 @@ public enum TokenType {
     SET("set"),
     LAMBDA("lambda"),
     FUNC("func"),
-    NIL("nil"),
+    NIL_LITERAL("nil"),
     COND("cond"),
     COMMENT(compile(";[^\n]*")),
     BOOLEAN_LITERAL(compile("false|true")),

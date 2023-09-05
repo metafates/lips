@@ -14,6 +14,11 @@ public final class ListNode extends Element {
         this.elements = elements;
     }
 
+    public ListNode(Element element) {
+        this.elements = new ArrayList<>();
+        elements.add(element);
+    }
+
     public List<Element> getElements() {
         return elements;
     }

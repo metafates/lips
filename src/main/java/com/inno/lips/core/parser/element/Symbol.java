@@ -11,4 +11,8 @@ public final class Symbol extends Atom {
     public String toString() {
         return "Symbol(%s)".formatted(getToken().source());
     }
+
+    public String name() {
+        return getToken().source();
+    }
 }

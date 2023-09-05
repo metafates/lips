@@ -33,6 +33,14 @@ public final class Set extends Atom {
         return new Set(symbol, iter.next(), atom.getToken());
     }
 
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public Element getElement() {
+        return element;
+    }
+
     @Override
     public String toString() {
         return "Set(%s, %s)".formatted(symbol, element);
