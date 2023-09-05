@@ -2,7 +2,7 @@ package com.inno.lips.core.parser.element;
 
 import com.inno.lips.core.lexer.Token;
 
-public sealed class Atom extends Element permits Literal, Cond, Lambda, Set, Symbol {
+public sealed class Atom extends Element permits Literal, Symbol {
     private final Token token;
 
     public Atom(Token token) {

@@ -2,7 +2,7 @@ package com.inno.lips.core.parser.element;
 
 import com.inno.lips.core.lexer.Token;
 
-public abstract sealed class Literal<T> extends Atom permits NilLiteral, BooleanLiteral, NumberLiteral, StringLiteral {
+public abstract sealed class Literal<T> extends Atom permits NullLiteral, BooleanLiteral, NumberLiteral, StringLiteral {
     private final T value;
 
     public Literal(T value, Token token) {

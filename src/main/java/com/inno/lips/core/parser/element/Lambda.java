@@ -1,17 +1,16 @@
 package com.inno.lips.core.parser.element;
 
-import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Lambda extends Atom {
+public final class Lambda extends SpecialForm {
     private final List<Symbol> parameters;
     private final Element body;
 
-    public Lambda(List<Symbol> parameters, Element body, Token token) {
-        super(token);
+    private Lambda(List<Symbol> parameters, Element body, List<Element> frame) {
+        super(frame);
 
         this.parameters = parameters;
         this.body = body;
@@ -25,7 +24,7 @@ public final class Lambda extends Atom {
 
         var iter = frame.iterator();
 
-        if (!(iter.next() instanceof Atom atom)) {
+        if (!(iter.next() instanceof Atom)) {
             // TODO
             throw new ParseException("lambda keyword missing");
         }
@@ -46,7 +45,7 @@ public final class Lambda extends Atom {
 
         var body = iter.next();
 
-        return new Lambda(parameters, body, atom.getToken());
+        return new Lambda(parameters, body, frame);
     }
 
     public List<Symbol> getParameters() {

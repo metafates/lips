@@ -9,12 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParserTest {
-    @Test(expected = TopLevelExpressionException.class)
-    public void mustForbidTopLevelAtoms() throws LexingException, ParseException {
-        Parser.parse("set sum 2");
-        Parser.parse("a");
-    }
-
     @Test
     public void mustParseValidExpressions() throws LexingException, ParseException {
         List<TestCase> cases = new ArrayList<>();

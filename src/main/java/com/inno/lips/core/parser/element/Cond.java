@@ -1,25 +1,25 @@
 package com.inno.lips.core.parser.element;
 
-import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.List;
+import java.util.Optional;
 
-public final class Cond extends Atom {
+public final class Cond extends SpecialForm {
     private final Element testExpr;
     private final Element thenExpr;
     private final Element elseExpr;
 
-    public Cond(Element testExpr, Element thenExpr, Element elseExpr, Token token) {
-        super(token);
+    private Cond(Element testExpr, Element thenExpr, Element elseExpr, List<Element> frame) {
+        super(frame);
 
         this.testExpr = testExpr;
         this.thenExpr = thenExpr;
         this.elseExpr = elseExpr;
     }
 
-    public Cond(Element testExpr, Element thenExpr, Token token) {
-        super(token);
+    private Cond(Element testExpr, Element thenExpr, List<Element> frame) {
+        super(frame);
 
         this.testExpr = testExpr;
         this.thenExpr = thenExpr;
@@ -42,10 +42,10 @@ public final class Cond extends Atom {
 
         if (iter.hasNext()) {
             var elseExpr = iter.next();
-            return new Cond(testExpr, thenExpr, elseExpr, atom.getToken());
+            return new Cond(testExpr, thenExpr, elseExpr, frame);
         }
 
-        return new Cond(testExpr, thenExpr, atom.getToken());
+        return new Cond(testExpr, thenExpr, frame);
     }
 
     public Element getElseExpr() {
@@ -56,8 +56,8 @@ public final class Cond extends Atom {
         return testExpr;
     }
 
-    public Element getThenExpr() {
-        return thenExpr;
+    public Optional<Element> getThenExpr() {
+        return Optional.ofNullable(elseExpr);
     }
 
     @Override

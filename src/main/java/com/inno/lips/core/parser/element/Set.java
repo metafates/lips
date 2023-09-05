@@ -1,16 +1,16 @@
 package com.inno.lips.core.parser.element;
 
-import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.List;
 
-public final class Set extends Atom {
+public final class Set extends SpecialForm {
     private final Symbol symbol;
     private final Element element;
 
-    public Set(Symbol symbol, Element element, Token token) {
-        super(token);
+    private Set(Symbol symbol, Element element, List<Element> frame) {
+        super(frame);
+
         this.symbol = symbol;
         this.element = element;
     }
@@ -30,7 +30,7 @@ public final class Set extends Atom {
             throw new ParseException("symbol expected");
         }
 
-        return new Set(symbol, iter.next(), atom.getToken());
+        return new Set(symbol, iter.next(), frame);
     }
 
     public Symbol getSymbol() {

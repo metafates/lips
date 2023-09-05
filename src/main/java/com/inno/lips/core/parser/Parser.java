@@ -16,14 +16,12 @@ public class Parser {
     }
 
     public static Element parse(List<Token> tokens) throws ParseException {
-        boolean stackUpdated = false;
         Deque<List<Element>> stack = new ArrayDeque<>();
         List<Element> frame = new ArrayList<>();
 
         for (var token : tokens) {
             switch (token.type()) {
                 case OPEN_PAREN -> {
-                    stackUpdated = true;
                     stack.push(frame);
                     frame = new ArrayList<>();
                 }
@@ -37,16 +35,12 @@ public class Parser {
                     frame = previousFrame;
                 }
                 default -> {
-                    if (stack.isEmpty()) {
-                        throw new TopLevelExpressionException();
-                    }
-
                     var element = switch (token.type()) {
                         case IDENTIFIER -> new Symbol(token);
                         case STRING_LITERAL -> StringLiteral.from(token);
                         case BOOLEAN_LITERAL -> BooleanLiteral.from(token);
                         case NUMBER_LITERAL -> NumberLiteral.from(token);
-                        case NIL_LITERAL -> new NilLiteral(token);
+                        case NULL_LITERAL -> new NullLiteral(token);
                         default -> new Atom(token);
                     };
 
@@ -57,10 +51,6 @@ public class Parser {
 
         if (!stack.isEmpty()) {
             throw new UnexpectedEOFException();
-        }
-
-        if (!stackUpdated) {
-            throw new TopLevelExpressionException();
         }
 
         // wrap whole tree as a list

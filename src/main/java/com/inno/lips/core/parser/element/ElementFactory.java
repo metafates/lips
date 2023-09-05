@@ -16,14 +16,16 @@ public class ElementFactory {
             return new ListNode(frame);
         }
 
-        if (atom instanceof Lambda || atom instanceof Set || atom instanceof Cond) {
-            return new ListNode(frame);
-        }
-
         return switch (atom.getToken().type()) {
             case SET -> Set.parse(frame);
             case LAMBDA -> Lambda.parse(frame);
             case COND -> Cond.parse(frame);
+            case WHILE -> While.parse(frame);
+            case RETURN -> Return.parse(frame);
+            case PROG -> Prog.parse(frame);
+            case FUNC -> Func.parse(frame);
+            case BREAK -> Break.parse(frame);
+            case QUOTE -> Quote.parse(frame);
             default -> new ListNode(frame);
         };
     }

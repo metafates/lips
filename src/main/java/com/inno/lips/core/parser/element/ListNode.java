@@ -1,9 +1,10 @@
 package com.inno.lips.core.parser.element;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public final class ListNode extends Element {
+public sealed class ListNode extends Element permits SpecialForm {
     private final List<Element> elements;
 
     public ListNode() {
@@ -14,9 +15,8 @@ public final class ListNode extends Element {
         this.elements = elements;
     }
 
-    public ListNode(Element element) {
-        this.elements = new ArrayList<>();
-        elements.add(element);
+    public ListNode(Element[] elements) {
+        this.elements = Arrays.stream(elements).toList();
     }
 
     public List<Element> getElements() {
