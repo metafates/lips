@@ -1,7 +1,7 @@
 package com.inno.lips.core.parser;
 
 import com.inno.lips.core.lexer.Token;
-import com.inno.lips.core.parser.ast.*;
+import com.inno.lips.core.parser.element.*;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -9,29 +9,21 @@ import java.util.Deque;
 import java.util.List;
 
 public class Parser {
-    private final List<Token> tokens;
-
-    private Parser(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-
     public static Element parse(List<Token> tokens) throws ParseException {
-        return new Parser(tokens).parse();
-    }
-
-    private Element parse() throws ParseException {
+        boolean stackUpdated = false;
         Deque<List<Element>> stack = new ArrayDeque<>();
         List<Element> frame = new ArrayList<>();
 
         for (var token : tokens) {
             switch (token.type()) {
                 case OPEN_PAREN -> {
+                    stackUpdated = true;
                     stack.push(frame);
                     frame = new ArrayList<>();
                 }
                 case CLOSE_PAREN -> {
                     if (stack.isEmpty()) {
-                        throw new ParseException("Unexpected closing paren");
+                        throw new ParseException("Unexpected closing parenthesis");
                     }
 
                     var previousFrame = stack.pop();
@@ -39,12 +31,12 @@ public class Parser {
                     frame = previousFrame;
                 }
                 default -> {
-                    Atom element = switch (token.type()) {
-                        case IDENTIFIER -> new Symbol(new SyntaxObject(token));
-                        case STRING_LITERAL -> new StringLiteral(new SyntaxObject(token));
-                        case BOOLEAN_LITERAL -> new BooleanLiteral(new SyntaxObject(token));
-                        case NUMBER_LITERAL -> new NumberLiteral(new SyntaxObject(token));
-                        default -> new Atom(new SyntaxObject(token));
+                    var element = switch (token.type()) {
+                        case IDENTIFIER -> new Symbol(token);
+                        case STRING_LITERAL -> StringLiteral.from(token);
+                        case BOOLEAN_LITERAL -> BooleanLiteral.from(token);
+                        case NUMBER_LITERAL -> NumberLiteral.from(token);
+                        default -> new Atom(token);
                     };
 
                     frame.add(element);
@@ -53,9 +45,14 @@ public class Parser {
         }
 
         if (!stack.isEmpty()) {
-            throw new UnexpectedEOFException();
+            throw new ParseException("Unexpected EOF");
         }
 
-        return ElementFactory.create(frame);
+        if (!stackUpdated) {
+            throw new ParseException("Top level expressions are forbidden");
+        }
+
+        // wrap whole tree as a list
+        return new ListNode(frame);
     }
 }
