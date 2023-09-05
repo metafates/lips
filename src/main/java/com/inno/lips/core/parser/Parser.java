@@ -42,6 +42,7 @@ public class Parser {
                         case NUMBER_LITERAL -> NumberLiteral.from(token);
                         case NULL_LITERAL -> new NullLiteral(token);
                         default -> new Atom(token);
+//                      default -> throw new InvalidSyntaxException("attempted to use special form without calling it");
                     };
 
                     frame.add(element);
