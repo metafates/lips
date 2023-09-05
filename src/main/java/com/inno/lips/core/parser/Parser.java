@@ -1,5 +1,7 @@
 package com.inno.lips.core.parser;
 
+import com.inno.lips.core.lexer.Lexer;
+import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.element.*;
 
@@ -9,6 +11,10 @@ import java.util.Deque;
 import java.util.List;
 
 public class Parser {
+    public static Element parse(String input) throws ParseException, LexingException {
+        return parse(Lexer.tokenize(input));
+    }
+
     public static Element parse(List<Token> tokens) throws ParseException {
         boolean stackUpdated = false;
         Deque<List<Element>> stack = new ArrayDeque<>();
@@ -45,11 +51,11 @@ public class Parser {
         }
 
         if (!stack.isEmpty()) {
-            throw new ParseException("Unexpected EOF");
+            throw new UnexpectedEOFException();
         }
 
         if (!stackUpdated) {
-            throw new ParseException("Top level expressions are forbidden");
+            throw new TopLevelExpressionException();
         }
 
         // wrap whole tree as a list
