@@ -29,9 +29,9 @@ public class ParserTest {
         cases.add(new TestCase("(lambda (a) (+ a a))", "List(Lambda([Symbol(a)], List(Symbol(+), Symbol(a), Symbol(a))))"));
         cases.add(new TestCase("((lambda (x) (x)) a)", "List(List(Lambda([Symbol(x)], List(Symbol(x))), Symbol(a)))"));
 
-        for (TestCase(String source, String expected) : cases) {
-            Element parsed = Parser.parse(source);
-            Assert.assertEquals(parsed.toString(), expected);
+        for (var test : cases) {
+            Element parsed = Parser.parse(test.source);
+            Assert.assertEquals(parsed.toString(), test.expected);
         }
     }
 
