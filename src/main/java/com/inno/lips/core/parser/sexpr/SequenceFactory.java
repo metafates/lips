@@ -15,10 +15,11 @@ public class SequenceFactory {
         List<SExpression> processed = new ArrayList<>();
 
         for (var element : elements) {
-            if (element instanceof Sequence sequence) {
-                processed.add(create(sequence.span(), sequence.getElements()));
-            } else {
+            if (element instanceof Atom || element instanceof SpecialForm) {
                 processed.add(element);
+            } else {
+                var sequence = (Sequence) element;
+                processed.add(create(sequence.span(), sequence.getElements()));
             }
         }
 
@@ -29,6 +30,7 @@ public class SequenceFactory {
         }
 
         if (head instanceof Symbol symbol) {
+            // TODO: there should be a better way
             return switch (symbol.getType()) {
                 case SET, LAMBDA, FUNC, COND, WHILE, PROG, QUOTE, RETURN, BREAK ->
                         SpecialFormFactory.create(span, symbol, tail);

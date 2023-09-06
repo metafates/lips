@@ -38,7 +38,26 @@ public class SExpressionFactory {
                 throw new UnexpectedEOFException();
             }
             case CLOSE_PAREN -> throw new InvalidSyntaxException("Unexpected closing parenthesis");
-            default -> AtomFactory.create(current);
+            default -> {
+                Atom atom = AtomFactory.create(current);
+
+                yield switch (atom.getType()) {
+                    case QUOTE_TICK -> expandQuoteMacro(atom.span(), rest);
+                    default -> atom;
+                };
+            }
         };
+    }
+
+    private static Quote expandQuoteMacro(Span span, Iterator<Token> tokens) throws ParseException {
+        if (!tokens.hasNext()) {
+            // TODO: more verbose message
+            throw new UnexpectedEOFException();
+        }
+
+        var next = tokens.next();
+        SExpression toQuote = create(next.span(), next, tokens);
+
+        return Quote.parse(span.join(toQuote.span()), toQuote);
     }
 }

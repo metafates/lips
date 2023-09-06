@@ -15,14 +15,16 @@ public final class Quote extends SpecialForm {
         this.body = body;
     }
 
+    public static Quote parse(Span span, SExpression toQuote) throws ParseException {
+        return new Quote(span, toQuote);
+    }
+
     public static Quote parse(Span span, List<SExpression> args) throws ParseException {
         if (args.size() != 1) {
             throw new SpecialFormArityMismatchException("quote", 1, args.size());
         }
 
-        var body = args.get(0);
-
-        return new Quote(span, body);
+        return parse(span, args.get(0));
     }
 
     @Override
