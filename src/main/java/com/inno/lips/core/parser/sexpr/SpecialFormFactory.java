@@ -1,6 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.ParseException;
 import org.apache.commons.lang.NotImplementedException;
 
@@ -19,7 +19,6 @@ public class SpecialFormFactory {
         return switch (head.getType()) {
             case SET -> Set.parse(span, tail);
             case LAMBDA -> Lambda.parse(span, tail);
-            case QUOTE, QUOTE_TICK -> Quote.parse(span, tail);
             default -> throw new NotImplementedException("not implemented");
         };
     }

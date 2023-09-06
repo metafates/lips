@@ -1,15 +1,14 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
+import com.inno.lips.core.common.Spannable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract sealed class SExpression permits Atom, Sequence {
-    private final Span span;
-
+public abstract sealed class SExpression extends Spannable permits Atom, Sequence {
     protected SExpression(Span span) {
-        this.span = span;
+        super(span);
     }
 
     public SExpression join(SExpression other) {
@@ -17,10 +16,6 @@ public abstract sealed class SExpression permits Atom, Sequence {
         joined.add(this);
         joined.add(other);
 
-        return new Sequence(span.join(other.span), joined);
-    }
-
-    public Span span() {
-        return span;
+        return new Sequence(span().join(other.span()), joined);
     }
 }

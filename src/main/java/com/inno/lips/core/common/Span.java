@@ -1,4 +1,4 @@
-package com.inno.lips.core.lexer;
+package com.inno.lips.core.common;
 
 public class Span {
     private final int start;
@@ -14,6 +14,10 @@ public class Span {
         this.end = position;
     }
 
+    public static Span zero() {
+        return new Span(0, 0);
+    }
+
     public int getStart() {
         return start;
     }
@@ -24,6 +28,10 @@ public class Span {
 
     public Span join(Span other) {
         return new Span(Math.min(start, other.start), Math.max(end, other.end));
+    }
+
+    public Span join(Spannable other) {
+        return join(other.span());
     }
 
     @Override

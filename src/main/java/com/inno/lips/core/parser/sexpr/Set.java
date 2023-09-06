@@ -1,6 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
@@ -20,13 +20,13 @@ public final class Set extends SpecialForm {
 
     public static Set parse(Span span, List<SExpression> args) throws ParseException {
         if (args.size() != 2) {
-            throw new SpecialFormArityMismatchException("set", 2, args.size());
+            throw new SpecialFormArityMismatchException(span, "set", 2, args.size());
         }
 
         var iter = args.iterator();
-
-        if (!(iter.next() instanceof Symbol symbol)) {
-            throw new InvalidSyntaxException("set expects symbol as identifier");
+        var next = iter.next();
+        if (!(next instanceof Symbol symbol)) {
+            throw new InvalidSyntaxException(next.span(), "set expects symbol as identifier");
         }
 
         return new Set(span, symbol, iter.next());

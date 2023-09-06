@@ -1,10 +1,11 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.lexer.TokenType;
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
+import com.inno.lips.core.parser.SpecialFormWithoutCallingException;
 import com.inno.lips.core.parser.UnexpectedEOFException;
 
 import java.util.ArrayList;
@@ -14,30 +15,48 @@ import java.util.List;
 public class SExpressionFactory {
     public static SExpression create(Iterator<Token> tokens) throws ParseException {
         if (!tokens.hasNext()) {
-            throw new UnexpectedEOFException();
+            throw new UnexpectedEOFException(new Span(0, 0));
         }
 
         var token = tokens.next();
-        return create(token.span(), token, tokens);
+
+        if (token.type().isSpecial()) {
+            throw new SpecialFormWithoutCallingException(token.span());
+        }
+
+        return create(token.span(), token, tokens, false);
     }
 
-    private static SExpression create(Span span, Token current, Iterator<Token> rest) throws ParseException {
+    private static SExpression create(Span span, Token current, Iterator<Token> rest, boolean quoted) throws ParseException {
         return switch (current.type()) {
             case OPEN_PAREN -> {
                 List<SExpression> frame = new ArrayList<>();
 
+                Token lastToken = null;
                 while (rest.hasNext()) {
                     var next = rest.next();
+                    lastToken = next;
+
                     if (next.type() == TokenType.CLOSE_PAREN) {
-                        yield SequenceFactory.create(span.join(next.span()), frame);
+                        var sequenceSpan = span.join(next);
+
+                        if (quoted) {
+                            yield new Sequence(sequenceSpan, frame);
+                        }
+
+                        yield SequenceFactory.create(sequenceSpan, frame);
                     }
 
-                    frame.add(create(span, next, rest));
+                    frame.add(create(span, next, rest, quoted));
                 }
 
-                throw new UnexpectedEOFException();
+                if (lastToken == null) {
+                    throw new UnexpectedEOFException(current.span());
+                }
+
+                throw new UnexpectedEOFException(current.span().join(lastToken));
             }
-            case CLOSE_PAREN -> throw new InvalidSyntaxException("Unexpected closing parenthesis");
+            case CLOSE_PAREN -> throw new InvalidSyntaxException(current.span(), "Unexpected closing parenthesis");
             default -> {
                 Atom atom = AtomFactory.create(current);
 
@@ -52,11 +71,11 @@ public class SExpressionFactory {
     private static Quote expandQuoteMacro(Span span, Iterator<Token> tokens) throws ParseException {
         if (!tokens.hasNext()) {
             // TODO: more verbose message
-            throw new UnexpectedEOFException();
+            throw new UnexpectedEOFException(span);
         }
 
         var next = tokens.next();
-        SExpression toQuote = create(next.span(), next, tokens);
+        SExpression toQuote = create(next.span(), next, tokens, true);
 
         return Quote.parse(span.join(toQuote.span()), toQuote);
     }

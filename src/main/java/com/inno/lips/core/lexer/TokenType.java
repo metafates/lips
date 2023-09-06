@@ -15,7 +15,7 @@ public enum TokenType {
     COND("cond"),
     WHILE("while"),
     PROG("prog"),
-    QUOTE("quote"),
+    //    QUOTE("quote"),
     RETURN("return"),
     BREAK("break"),
     COMMENT(compile(";[^\n]*")),
@@ -64,5 +64,27 @@ public enum TokenType {
 
     public static boolean matchesAny(String string) {
         return TokenType.matchPattern(string).isPresent();
+    }
+
+    public boolean isSpecial() {
+        var specialTypes = new TokenType[]{
+                TokenType.SET,
+                TokenType.LAMBDA,
+                TokenType.FUNC,
+                TokenType.COND,
+                TokenType.WHILE,
+                TokenType.PROG,
+                TokenType.RETURN,
+                TokenType.RETURN,
+                TokenType.BREAK
+        };
+
+        for (var specialType : specialTypes) {
+            if (this == specialType) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

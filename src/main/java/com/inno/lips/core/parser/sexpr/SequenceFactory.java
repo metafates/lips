@@ -1,6 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.ArrayList;
@@ -29,13 +29,8 @@ public class SequenceFactory {
             tail = processed.subList(1, processed.size());
         }
 
-        if (head instanceof Symbol symbol) {
-            // TODO: there should be a better way
-            return switch (symbol.getType()) {
-                case SET, LAMBDA, FUNC, COND, WHILE, PROG, QUOTE, RETURN, BREAK ->
-                        SpecialFormFactory.create(span, symbol, tail);
-                default -> new Sequence(span, processed);
-            };
+        if (head instanceof Symbol symbol && symbol.getType().isSpecial()) {
+            return SpecialFormFactory.create(span, symbol, tail);
         }
 
         return new Sequence(span, processed);

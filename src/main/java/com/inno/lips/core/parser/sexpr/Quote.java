@@ -1,6 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 
@@ -21,7 +21,7 @@ public final class Quote extends SpecialForm {
 
     public static Quote parse(Span span, List<SExpression> args) throws ParseException {
         if (args.size() != 1) {
-            throw new SpecialFormArityMismatchException("quote", 1, args.size());
+            throw new SpecialFormArityMismatchException(span, "quote", 1, args.size());
         }
 
         return parse(span, args.get(0));

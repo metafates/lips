@@ -1,6 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
@@ -23,7 +23,7 @@ public final class Lambda extends SpecialForm {
 
     public static Lambda parse(Span span, List<SExpression> args) throws ParseException {
         if (args.size() != 2) {
-            throw new SpecialFormArityMismatchException("lambda", 2, args.size());
+            throw new SpecialFormArityMismatchException(span, "lambda", 2, args.size());
         }
 
         var parameters = parseParameters(args.get(0));
@@ -34,7 +34,7 @@ public final class Lambda extends SpecialForm {
 
     private static List<Parameter> parseParameters(SExpression sExpression) throws ParseException {
         if (!(sExpression instanceof Sequence sequence)) {
-            throw new InvalidSyntaxException("lambda accepts list as parameters");
+            throw new InvalidSyntaxException(sExpression.span(), "lambda accepts list as parameters");
         }
 
         Set<String> parametersNames = new HashSet<>();
@@ -43,12 +43,12 @@ public final class Lambda extends SpecialForm {
         for (SExpression element : sequence.getElements()) {
             var parameter = Parameter.parse(element);
 
-            if (parametersNames.contains(parameter.name())) {
+            if (parametersNames.contains(parameter.getName())) {
                 // TODO: better message
-                throw new ParseException("duplicated param names");
+                throw new ParseException(parameter.span(), "duplicated param names");
             }
 
-            parametersNames.add(parameter.name());
+            parametersNames.add(parameter.getName());
             parameters.add(parameter);
         }
 

@@ -1,5 +1,7 @@
 package com.inno.lips.core.lexer;
 
+import com.inno.lips.core.common.Span;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +56,7 @@ public class Lexer {
         }
 
         if (!window.isEmpty()) {
-            throw new UnexpectedEOFException(new Span(windowStart, chars.length), input);
+            throw new UnexpectedEOFException(new Span(windowStart, chars.length));
         }
 
         return tokens;
