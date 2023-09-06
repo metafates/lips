@@ -30,7 +30,6 @@ public final class Lambda extends SpecialForm {
 
     @Override
     public String toString() {
-        List<String> strings = parameters.stream().map(String::valueOf).toList();
-        return "Lambda(%s -> %s)".formatted(String.join(", ", strings), body);
+        return "Lambda(%s -> %s)".formatted(parameters, body);
     }
 }

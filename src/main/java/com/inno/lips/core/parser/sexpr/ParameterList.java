@@ -2,14 +2,21 @@ package com.inno.lips.core.parser.sexpr;
 
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.*;
 
-public class ParameterList extends ArrayList<Parameter> {
-    private ParameterList(@NotNull Collection<? extends Parameter> c) {
-        super(c);
+public class ParameterList {
+    private final Set<String> names;
+    private final List<Parameter> parameters;
+    private boolean parameterWithDefaultValueAppeared;
+
+    private ParameterList() {
+        this.parameters = new ArrayList<>();
+        this.names = new HashSet<>();
+        this.parameterWithDefaultValueAppeared = false;
     }
 
     public static ParameterList parse(SExpression sExpression) throws ParseException {
@@ -17,29 +24,36 @@ public class ParameterList extends ArrayList<Parameter> {
             throw new InvalidSyntaxException(sExpression.span(), "lambda accepts list as parameters");
         }
 
-        Set<String> parametersNames = new HashSet<>();
-        List<Parameter> parameters = new ArrayList<>();
-
-        boolean paramWithDefaultValueMet = false;
+        var parameters = new ParameterList();
 
         for (SExpression element : sequence.getElements()) {
             var parameter = Parameter.parse(element);
 
-            if (parametersNames.contains(parameter.getName())) {
-                // TODO: better message
-                throw new ParseException(parameter.span(), "duplicated param names");
-            }
-
-            parametersNames.add(parameter.getName());
             parameters.add(parameter);
-
-            if (parameter.getDefaultValue().isPresent()) {
-                paramWithDefaultValueMet = true;
-            } else if (paramWithDefaultValueMet) {
-                throw new ParseException(parameter.span(), "non-default argument follows default argument");
-            }
         }
 
-        return new ParameterList(parameters);
+        return parameters;
+    }
+
+    private void add(Parameter parameter) throws ParseException {
+        if (names.contains(parameter.getName())) {
+            // TODO: better message
+            throw new ParseException(parameter.span(), "Duplicate parameter");
+        }
+
+        if (parameter.getDefaultValue().isPresent()) {
+            parameterWithDefaultValueAppeared = true;
+        } else if (parameterWithDefaultValueAppeared) {
+            throw new ParseException(parameter.span(), "Non-default argument follows default argument");
+        }
+
+        names.add(parameter.getName());
+        parameters.add(parameter);
+    }
+
+    @Override
+    public String toString() {
+        List<String> strings = parameters.stream().map(String::valueOf).toList();
+        return "Parameters(%s)".formatted(String.join(", ", strings));
     }
 }

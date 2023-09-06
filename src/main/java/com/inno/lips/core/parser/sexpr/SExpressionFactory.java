@@ -38,7 +38,7 @@ public class SExpressionFactory {
                     lastToken = next;
 
                     if (next.type() == TokenType.CLOSE_PAREN) {
-                        var sequenceSpan = span.join(next);
+                        var sequenceSpan = current.span().join(next);
 
                         if (quoted) {
                             yield new Sequence(sequenceSpan, frame);
