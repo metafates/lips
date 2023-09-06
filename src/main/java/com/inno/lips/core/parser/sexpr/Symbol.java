@@ -1,14 +1,15 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Token;
+import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.lexer.TokenType;
 
 public final class Symbol extends Atom {
     private final String name;
 
-    public Symbol(Token token) {
-        super(token);
+    public Symbol(Span span, TokenType type, String name) {
+        super(span, type);
 
-        this.name = token.source();
+        this.name = name;
     }
 
     public String getName() {

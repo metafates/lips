@@ -1,5 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
+import com.inno.lips.core.lexer.Span;
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
@@ -13,14 +14,14 @@ public final class Lambda extends SpecialForm {
     private final List<Parameter> parameters;
     private final SExpression body;
 
-    private Lambda(List<SExpression> elements, List<Parameter> parameters, SExpression body) {
-        super(elements);
+    private Lambda(Span span, List<Parameter> parameters, SExpression body) {
+        super(span);
 
         this.parameters = parameters;
         this.body = body;
     }
 
-    public static Lambda parse(Symbol keyword, List<SExpression> args) throws ParseException {
+    public static Lambda parse(Span span, List<SExpression> args) throws ParseException {
         if (args.size() != 2) {
             throw new SpecialFormArityMismatchException("lambda", 2, args.size());
         }
@@ -28,11 +29,7 @@ public final class Lambda extends SpecialForm {
         var parameters = parseParameters(args.get(0));
         var body = args.get(1);
 
-        List<SExpression> elements = new ArrayList<>();
-        elements.add(keyword);
-        elements.addAll(args);
-
-        return new Lambda(elements, parameters, body);
+        return new Lambda(span, parameters, body);
     }
 
     private static List<Parameter> parseParameters(SExpression sExpression) throws ParseException {

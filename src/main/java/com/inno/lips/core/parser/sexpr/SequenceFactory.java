@@ -1,21 +1,22 @@
 package com.inno.lips.core.parser.sexpr;
 
+import com.inno.lips.core.lexer.Span;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SequenceFactory {
-    public static Sequence create(List<SExpression> elements) throws ParseException {
+    public static Sequence create(Span span, List<SExpression> elements) throws ParseException {
         if (elements.isEmpty()) {
-            return new Sequence();
+            return new Sequence(span);
         }
 
         List<SExpression> processed = new ArrayList<>();
 
         for (var element : elements) {
             if (element instanceof Sequence sequence) {
-                processed.add(create(sequence.getElements()));
+                processed.add(create(sequence.span(), sequence.getElements()));
             } else {
                 processed.add(element);
             }
@@ -27,14 +28,14 @@ public class SequenceFactory {
             tail = processed.subList(1, processed.size());
         }
 
-        if (head instanceof Symbol symbol && symbol.getToken().isPresent()) {
-            return switch (symbol.getToken().get().type()) {
+        if (head instanceof Symbol symbol) {
+            return switch (symbol.getType()) {
                 case SET, LAMBDA, FUNC, COND, WHILE, PROG, QUOTE, RETURN, BREAK ->
-                        SpecialFormFactory.create(symbol, tail);
-                default -> new Sequence(processed);
+                        SpecialFormFactory.create(span, symbol, tail);
+                default -> new Sequence(span, processed);
             };
         }
 
-        return new Sequence(processed);
+        return new Sequence(span, processed);
     }
 }

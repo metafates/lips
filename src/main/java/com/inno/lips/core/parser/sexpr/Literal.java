@@ -1,18 +1,13 @@
 package com.inno.lips.core.parser.sexpr;
 
-import com.inno.lips.core.lexer.Token;
+import com.inno.lips.core.lexer.Span;
+import com.inno.lips.core.lexer.TokenType;
 
 public abstract sealed class Literal<T> extends Atom permits BooleanLiteral, NullLiteral, NumberLiteral, StringLiteral {
     private final T value;
 
-    public Literal(Token token, T value) {
-        super(token);
-
-        this.value = value;
-    }
-
-    public Literal(T value) {
-        super();
+    public Literal(Span span, TokenType type, T value) {
+        super(span, type);
 
         this.value = value;
     }

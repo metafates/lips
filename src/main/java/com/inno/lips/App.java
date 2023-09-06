@@ -27,6 +27,13 @@ public class App {
 
                 var sexpr = Parser.parse(tokens.iterator());
                 System.out.println(sexpr);
+//                if (sexpr instanceof Sequence sequence) {
+//                    for (var element : sequence.getElements()) {
+//                        System.out.println(element.span());
+//                    }
+//                }
+//
+//                System.out.println(sexpr.span());
             } catch (LexingException e) {
                 System.err.println(e.pretty());
             } catch (ParseException e) {

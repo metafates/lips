@@ -1,42 +1,22 @@
 package com.inno.lips.core.parser.sexpr;
 
 import com.inno.lips.core.lexer.Span;
-import com.inno.lips.core.lexer.Token;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.inno.lips.core.lexer.TokenType;
 
 public abstract sealed class Atom extends SExpression permits Symbol, Literal {
-    private final Token token;
+    private final TokenType type;
 
-    public Atom(Token token) {
-        this.token = token;
-    }
-
-    public Atom() {
-        this.token = null;
-    }
-
-    public Optional<Token> getToken() {
-        return Optional.ofNullable(token);
+    public Atom(Span span, TokenType type) {
+        super(span);
+        this.type = type;
     }
 
     @Override
     public String toString() {
-        return "Atom(%s)".formatted(token);
+        return "Atom(%s)".formatted(type);
     }
 
-    @Override
-    public SExpression join(SExpression other) {
-        List<SExpression> joined = new ArrayList<>();
-        joined.add(this);
-        joined.add(other);
-        return new Sequence(joined);
-    }
-
-    @Override
-    public Optional<Span> span() {
-        return getToken().map(Token::span);
+    public TokenType getType() {
+        return type;
     }
 }
