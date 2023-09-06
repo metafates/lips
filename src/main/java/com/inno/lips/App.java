@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-/**
- * Hello world!
- */
 public class App {
     public static void main(String[] args) throws IOException {
         var reader = new BufferedReader(new InputStreamReader(System.in));
@@ -23,10 +20,6 @@ public class App {
 
             try {
                 List<Token> tokens = Lexer.tokenize(line);
-                for (var token : tokens) {
-                    System.out.println(token);
-                }
-
                 var sexpr = Parser.parse(tokens.iterator());
                 System.out.println(sexpr);
             } catch (LexingException | ParseException e) {

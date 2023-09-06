@@ -1,4 +1,4 @@
-package com.inno.lips.core.lexer;
+package com.inno.lips.core.common;
 
 public record Position(int line, int column) {
     public static Position fromIndex(String text, int index) {

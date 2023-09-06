@@ -1,15 +1,15 @@
 package com.inno.lips.core.parser.sexpr;
 
 import com.inno.lips.core.common.Span;
+import com.inno.lips.core.common.Spannable;
 import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
-import com.inno.lips.core.common.Spannable;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 
 import java.util.List;
 import java.util.Optional;
 
-class Parameter extends Spannable {
+public class Parameter extends Spannable {
     private final String name;
     private final Literal<?> defaultValue;
 

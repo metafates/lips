@@ -1,7 +1,5 @@
 package com.inno.lips.core.common;
 
-import com.inno.lips.core.lexer.Position;
-
 public abstract class SpannedException extends Exception {
     private final Span span;
 
