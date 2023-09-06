@@ -25,10 +25,12 @@ public class App {
                     System.out.println(token);
                 }
 
-                var sexpr = Parser.parse(tokens);
+                var sexpr = Parser.parse(tokens.iterator());
                 System.out.println(sexpr);
-            } catch (LexingException | ParseException e) {
-                System.err.println(e.getMessage());
+            } catch (LexingException e) {
+                System.err.println(e.pretty());
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
             } catch (IOException e) {
                 throw new java.lang.RuntimeException(e);
             }

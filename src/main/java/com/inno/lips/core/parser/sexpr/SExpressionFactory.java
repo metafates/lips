@@ -6,55 +6,37 @@ import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.UnexpectedEOFException;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 
 public class SExpressionFactory {
-    public static SExpression create(List<Token> tokens) throws ParseException {
-
-        Deque<Token> stack = new ArrayDeque<>(tokens);
-
-        if (stack.isEmpty()) {
+    public static SExpression create(Iterator<Token> tokens) throws ParseException {
+        if (!tokens.hasNext()) {
             throw new UnexpectedEOFException();
         }
 
-        SExpression root = createOne(stack);
-        while (!stack.isEmpty()) {
-            root = root.join(createOne(stack));
-        }
-
-        return root;
+        return create(tokens.next(), tokens);
     }
 
-    private static SExpression createOne(Deque<Token> tokens) throws ParseException {
-        if (tokens.isEmpty()) {
-            throw new UnexpectedEOFException();
-        }
-
-        var token = tokens.pop();
-
-        return switch (token.type()) {
+    private static SExpression create(Token current, Iterator<Token> rest) throws ParseException {
+        return switch (current.type()) {
             case OPEN_PAREN -> {
                 List<SExpression> frame = new ArrayList<>();
 
-                while (true) {
-                    if (tokens.peek() == null) {
-                        throw new UnexpectedEOFException();
+                while (rest.hasNext()) {
+                    var next = rest.next();
+                    if (next.type() == TokenType.CLOSE_PAREN) {
+                        yield SequenceFactory.create(frame);
                     }
 
-                    if (tokens.peek().type() == TokenType.CLOSE_PAREN) break;
-
-                    var parsed = createOne(tokens);
-                    frame.add(parsed);
+                    frame.add(create(next, rest));
                 }
 
-                tokens.pop();
-                yield SequenceFactory.create(frame);
+                throw new UnexpectedEOFException();
             }
             case CLOSE_PAREN -> throw new InvalidSyntaxException("Unexpected closing parenthesis");
-            default -> AtomFactory.create(token);
+            default -> AtomFactory.create(current);
         };
     }
 }
