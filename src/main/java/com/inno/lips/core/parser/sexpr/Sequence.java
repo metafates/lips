@@ -21,7 +21,7 @@ public sealed class Sequence extends SExpression permits SpecialForm {
     @Override
     public String toString() {
         List<String> strings = getElements().stream().map(String::valueOf).toList();
-        return "List(%s)".formatted(String.join(", ", strings));
+        return "Sequence(%s)".formatted(String.join(", ", strings));
     }
 
     @Override
