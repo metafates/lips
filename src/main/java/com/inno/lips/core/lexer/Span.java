@@ -22,8 +22,8 @@ public class Span {
         return end;
     }
 
-    public boolean isSingle() {
-        return start == end;
+    public Span join(Span other) {
+        return new Span(Math.min(start, other.start), Math.max(end, other.end));
     }
 
     @Override

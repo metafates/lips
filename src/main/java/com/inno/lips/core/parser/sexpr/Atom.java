@@ -1,5 +1,6 @@
 package com.inno.lips.core.parser.sexpr;
 
+import com.inno.lips.core.lexer.Span;
 import com.inno.lips.core.lexer.Token;
 
 import java.util.ArrayList;
@@ -32,5 +33,10 @@ public abstract sealed class Atom extends SExpression permits Symbol, Literal {
         joined.add(this);
         joined.add(other);
         return new Sequence(joined);
+    }
+
+    @Override
+    public Optional<Span> span() {
+        return getToken().map(Token::span);
     }
 }
