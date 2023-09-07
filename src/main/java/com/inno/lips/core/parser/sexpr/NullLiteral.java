@@ -10,7 +10,7 @@ public final class NullLiteral extends Literal<ObjectUtils.Null> {
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         return "Null";
     }
 }

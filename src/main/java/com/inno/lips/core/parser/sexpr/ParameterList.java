@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ParameterList {
+public class ParameterList implements Node {
     private final Set<String> names;
     private final List<Parameter> parameters;
     private boolean parameterWithDefaultValueAppeared;
@@ -52,8 +52,8 @@ public class ParameterList {
     }
 
     @Override
-    public String toString() {
-        List<String> strings = parameters.stream().map(String::valueOf).toList();
+    public String AST() {
+        List<String> strings = parameters.stream().map(Parameter::AST).toList();
         return "Parameters(%s)".formatted(String.join(", ", strings));
     }
 }

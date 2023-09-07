@@ -23,8 +23,8 @@ public sealed class Sequence extends SExpression permits SpecialForm {
     }
 
     @Override
-    public String toString() {
-        List<String> strings = getElements().stream().map(String::valueOf).toList();
+    public String AST() {
+        List<String> strings = getElements().stream().map(SExpression::AST).toList();
         return "Sequence(%s)".formatted(String.join(", ", strings));
     }
 }

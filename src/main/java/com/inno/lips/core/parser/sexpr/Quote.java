@@ -28,7 +28,7 @@ public final class Quote extends SpecialForm {
     }
 
     @Override
-    public String toString() {
-        return "Quote(%s)".formatted(body);
+    public String AST() {
+        return "Quote(%s)".formatted(body.AST());
     }
 }

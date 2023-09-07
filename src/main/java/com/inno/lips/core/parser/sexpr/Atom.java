@@ -12,7 +12,7 @@ public abstract sealed class Atom extends SExpression permits Symbol, Literal {
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         return "Atom(%s)".formatted(type);
     }
 

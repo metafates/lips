@@ -46,7 +46,7 @@ public class Repl {
             var sexpr = Parser.parse(tokens.iterator());
 
             for (SExpression sExpression : sexpr) {
-                System.out.println(sExpression);
+                System.out.println(sExpression.AST());
             }
         } catch (LexingException | ParseException e) {
             System.err.print(e.show(line));

@@ -18,7 +18,7 @@ public final class StringLiteral extends Literal<String> {
     }
 
     @Override
-    public String toString() {
-        return "String(%s)".formatted(getValue());
+    public String AST() {
+        return "String(\"%s\")".formatted(getValue());
     }
 }

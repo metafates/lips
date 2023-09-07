@@ -37,7 +37,7 @@ public final class Set extends SpecialForm {
     }
 
     @Override
-    public String toString() {
-        return "Set(%s, %s)".formatted(symbol, value);
+    public String AST() {
+        return "Set(%s, %s)".formatted(symbol.AST(), value.AST());
     }
 }

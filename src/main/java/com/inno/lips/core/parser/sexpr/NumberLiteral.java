@@ -15,7 +15,7 @@ public final class NumberLiteral extends Literal<Float> {
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         return "Number(%f)".formatted(getValue());
     }
 }

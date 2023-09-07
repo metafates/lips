@@ -9,7 +9,7 @@ import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 import java.util.List;
 import java.util.Optional;
 
-public class Parameter extends Spannable {
+public class Parameter extends Spannable implements Node {
     private final String name;
     private final Literal<?> defaultValue;
 
@@ -64,11 +64,11 @@ public class Parameter extends Spannable {
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         if (defaultValue == null) {
             return "Param(%s)".formatted(name);
         }
 
-        return "Param(%s ? %s)".formatted(name, defaultValue);
+        return "Param(%s ? %s)".formatted(name, defaultValue.AST());
     }
 }

@@ -35,7 +35,7 @@ public final class Func extends SpecialForm {
     }
 
     @Override
-    public String toString() {
-        return "Func(%s, %s -> %s)".formatted(identifier, parameters, body);
+    public String AST() {
+        return "Func(%s, %s -> %s)".formatted(identifier.AST(), parameters.AST(), body.AST());
     }
 }

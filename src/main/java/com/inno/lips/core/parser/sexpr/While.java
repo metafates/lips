@@ -28,11 +28,9 @@ public final class While extends SpecialForm {
         return new While(span, testExpression, body);
     }
 
-    public SExpression getTestExpression() {
-        return testExpression;
-    }
-
-    public List<SExpression> getBody() {
-        return body;
+    @Override
+    public String AST() {
+        List<String> strings = body.stream().map(SExpression::AST).toList();
+        return "While(%s -> %s)".formatted(testExpression.AST(), String.join(", ", strings));
     }
 }

@@ -10,7 +10,7 @@ public abstract sealed class SpecialForm extends Sequence permits Func, Lambda, 
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         List<String> strings = getElements().stream().map(String::valueOf).toList();
         return "Special(%s)".formatted(String.join(", ", strings));
     }

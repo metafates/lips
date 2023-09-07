@@ -29,7 +29,7 @@ public final class Lambda extends SpecialForm {
     }
 
     @Override
-    public String toString() {
-        return "Lambda(%s -> %s)".formatted(parameters, body);
+    public String AST() {
+        return "Lambda(%s -> %s)".formatted(parameters.AST(), body.AST());
     }
 }

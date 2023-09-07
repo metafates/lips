@@ -15,7 +15,7 @@ public final class BooleanLiteral extends Literal<Boolean> {
     }
 
     @Override
-    public String toString() {
+    public String AST() {
         return "Boolean(%s)".formatted(getValue());
     }
 }

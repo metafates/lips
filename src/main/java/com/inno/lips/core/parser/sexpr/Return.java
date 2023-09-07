@@ -24,7 +24,7 @@ public final class Return extends SpecialForm {
     }
 
     @Override
-    public String toString() {
-        return "Return(%s)".formatted(value);
+    public String AST() {
+        return "Return(%s)".formatted(value.AST());
     }
 }
