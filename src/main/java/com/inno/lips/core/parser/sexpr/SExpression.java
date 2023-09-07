@@ -7,4 +7,6 @@ public abstract sealed class SExpression extends Spannable implements Node permi
     protected SExpression(Span span) {
         super(span);
     }
+
+    public abstract boolean asBoolean();
 }

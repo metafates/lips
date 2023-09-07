@@ -21,4 +21,9 @@ public final class StringLiteral extends Literal<String> {
     public String AST() {
         return "String(\"%s\")".formatted(getValue());
     }
+
+    @Override
+    public boolean asBoolean() {
+        return !getValue().isBlank();
+    }
 }

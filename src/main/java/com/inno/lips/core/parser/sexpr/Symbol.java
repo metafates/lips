@@ -25,4 +25,18 @@ public final class Symbol extends Atom {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean asBoolean() {
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Symbol symbol) {
+            return name.equals(symbol.name);
+        }
+
+        return false;
+    }
 }

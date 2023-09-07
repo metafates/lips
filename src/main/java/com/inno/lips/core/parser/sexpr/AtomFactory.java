@@ -9,7 +9,7 @@ public class AtomFactory {
             case STRING_LITERAL -> StringLiteral.parse(token);
             case BOOLEAN_LITERAL -> BooleanLiteral.parse(token);
             case NUMBER_LITERAL -> NumberLiteral.parse(token);
-            case NULL_LITERAL -> new NullLiteral(token.span());
+            case NIL -> new Nil(token.span());
             default -> new Symbol(token.span(), token.type(), token.source());
         };
     }

@@ -14,4 +14,14 @@ public abstract sealed class SpecialForm extends Sequence permits Func, Lambda, 
         List<String> strings = getElements().stream().map(String::valueOf).toList();
         return "Special(%s)".formatted(String.join(", ", strings));
     }
+
+    @Override
+    public boolean asBoolean() {
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return false;
+    }
 }

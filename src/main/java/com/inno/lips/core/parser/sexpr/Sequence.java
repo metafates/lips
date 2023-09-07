@@ -18,6 +18,11 @@ public sealed class Sequence extends SExpression permits SpecialForm {
         this.elements = new ArrayList<>();
     }
 
+    @Override
+    public boolean asBoolean() {
+        return !elements.isEmpty();
+    }
+
     public List<SExpression> getElements() {
         return elements;
     }
@@ -32,5 +37,24 @@ public sealed class Sequence extends SExpression permits SpecialForm {
     public String toString() {
         List<String> strings = getElements().stream().map(String::valueOf).toList();
         return "(%s)".formatted(String.join(" ", strings));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Sequence sequence)) {
+            return false;
+        }
+
+        if (elements.size() != sequence.elements.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < elements.size(); i++) {
+            if (!elements.get(i).equals(sequence.elements.get(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

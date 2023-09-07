@@ -33,7 +33,12 @@ public final class SetQ extends SpecialForm {
             throw new InvalidSyntaxException(symbol.span(), "symbol is reserved");
         }
 
-        return new SetQ(span, symbol, iter.next());
+        var value = iter.next();
+        if (value instanceof Symbol valueSymbol && valueSymbol.getType().isSpecial()) {
+            throw new InvalidSyntaxException(valueSymbol.span(), "symbol is reserved");
+        }
+
+        return new SetQ(span, symbol, value);
     }
 
     @Override

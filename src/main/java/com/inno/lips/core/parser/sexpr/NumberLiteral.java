@@ -18,4 +18,9 @@ public final class NumberLiteral extends Literal<Float> {
     public String AST() {
         return "Number(%f)".formatted(getValue());
     }
+
+    @Override
+    public boolean asBoolean() {
+        return getValue() != 0;
+    }
 }

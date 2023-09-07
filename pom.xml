@@ -111,6 +111,19 @@
                         </descriptorRefs>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>appassembler-maven-plugin</artifactId>
+                    <version>1.10</version>
+                    <configuration>
+                        <programs>
+                            <program>
+                                <mainClass>com.inno.lips.App</mainClass>
+                                <id>lips</id>
+                            </program>
+                        </programs>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
