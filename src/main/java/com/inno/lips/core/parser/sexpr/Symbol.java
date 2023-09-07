@@ -20,4 +20,9 @@ public final class Symbol extends Atom {
     public String AST() {
         return "Symbol(%s)".formatted(name);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

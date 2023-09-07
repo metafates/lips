@@ -20,4 +20,9 @@ public abstract sealed class Literal<T> extends Atom permits BooleanLiteral, Nul
     public String AST() {
         return "Literal(%s)".formatted(value);
     }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 }
