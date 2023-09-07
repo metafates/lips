@@ -18,6 +18,10 @@ public class Span {
         return new Span(0, 0);
     }
 
+    public boolean isSingle() {
+        return start == end;
+    }
+
     public int getStart() {
         return start;
     }
@@ -34,9 +38,39 @@ public class Span {
         return join(other.span());
     }
 
+    public String show(String source) {
+        var lines = source.lines().toList();
+        var startPos = Position.fromIndex(source, start);
+        var endPos = Position.fromIndex(source, end);
+
+        var builder = new StringBuilder();
+
+        if (startPos.line() == endPos.line()) {
+            var pad = " ".repeat(Math.max(0, startPos.column()));
+            var underline = "^".repeat(Math.max(0, endPos.column() - startPos.column() + 1));
+
+            builder
+                    .append(lines.get(startPos.line()))
+                    .append('\n')
+                    .append(pad)
+                    .append(underline)
+                    .append('\n');
+
+            return builder.toString();
+        }
+
+        var errorLines = lines.subList(startPos.line(), endPos.line());
+
+        for (var line : errorLines) {
+            builder.append("| ").append(line).append('\n');
+        }
+
+        return builder.toString();
+    }
+
     @Override
     public String toString() {
-        if (start == end) {
+        if (isSingle()) {
             return String.valueOf(start);
         }
 

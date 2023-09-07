@@ -23,7 +23,7 @@ public class App {
                 var sexpr = Parser.parse(tokens.iterator());
                 System.out.println(sexpr);
             } catch (LexingException | ParseException e) {
-                System.err.println(e.pretty(line));
+                System.err.println(e.show(line));
             }
         }
     }
