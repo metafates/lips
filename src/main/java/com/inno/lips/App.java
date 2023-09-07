@@ -1,5 +1,6 @@
 package com.inno.lips;
 
+import com.github.tomaslanger.chalk.Chalk;
 import com.inno.lips.core.lexer.Lexer;
 import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
@@ -16,6 +17,7 @@ public class App {
         var reader = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
+            System.out.print(Chalk.on("> ").bold().magenta());
             var line = reader.readLine();
 
             try {

@@ -17,9 +17,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.javatuples</groupId>
-            <artifactId>javatuples</artifactId>
-            <version>1.2</version>
+            <groupId>com.github.tomas-langer</groupId>
+            <artifactId>chalk</artifactId>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

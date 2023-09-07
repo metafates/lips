@@ -24,10 +24,10 @@ public class SExpressionFactory {
             throw new SpecialFormWithoutCallingException(token.span());
         }
 
-        return create(token.span(), token, tokens, false);
+        return create(token.span(), token, tokens);
     }
 
-    private static SExpression create(Span span, Token current, Iterator<Token> rest, boolean quoted) throws ParseException {
+    private static SExpression create(Span span, Token current, Iterator<Token> rest) throws ParseException {
         return switch (current.type()) {
             case OPEN_PAREN -> {
                 List<SExpression> frame = new ArrayList<>();
@@ -41,14 +41,10 @@ public class SExpressionFactory {
                     if (next.type() == TokenType.CLOSE_PAREN) {
                         var sequenceSpan = current.span().join(next);
 
-                        if (quoted) {
-                            yield new Sequence(sequenceSpan, frame);
-                        }
-
                         yield SequenceFactory.create(sequenceSpan, frame);
                     }
 
-                    frame.add(create(span, next, rest, quoted));
+                    frame.add(create(span, next, rest));
                 }
 
                 if (lastToken == null) {
@@ -76,7 +72,7 @@ public class SExpressionFactory {
         }
 
         var next = tokens.next();
-        SExpression toQuote = create(next.span(), next, tokens, true);
+        SExpression toQuote = create(next.span(), next, tokens);
 
         return Quote.parse(span.join(toQuote.span()), toQuote);
     }

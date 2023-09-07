@@ -1,5 +1,7 @@
 package com.inno.lips.core.common;
 
+import com.github.tomaslanger.chalk.Chalk;
+
 public abstract class SpannedException extends Exception {
     private final Span span;
 
@@ -18,23 +20,17 @@ public abstract class SpannedException extends Exception {
         var startPos = Position.fromIndex(source, span.getStart());
         var endPos = Position.fromIndex(source, span.getEnd());
 
+        String line;
         if (startPos.line() == endPos.line()) {
-            builder
-                    .append("Error on line ")
-                    .append(startPos.line() + 1)
-                    .append(" column ")
-                    .append(startPos.column() + 1);
+            line = "Error on line %d column %d".formatted(startPos.line() + 1, startPos.column() + 1);
         } else {
-            builder
-                    .append("Error on lines ")
-                    .append(startPos.line() + 1)
-                    .append("-")
-                    .append(endPos.line() + 1);
+            line = "Error on lines %d - %d".formatted(startPos.line() + 1, endPos.line() + 1);
         }
 
+        builder.append(Chalk.on(line).red());
         builder
                 .append('\n')
-                .append(getMessage())
+                .append(Chalk.on(getMessage()).red())
                 .append("\n\n")
                 .append(span.show(source));
 
