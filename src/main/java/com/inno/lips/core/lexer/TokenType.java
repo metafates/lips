@@ -1,5 +1,7 @@
 package com.inno.lips.core.lexer;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,7 +11,7 @@ import static java.util.regex.Pattern.compile;
 public enum TokenType {
     OPEN_PAREN("("),
     CLOSE_PAREN(")"),
-    SET("set"),
+    SETQ("setq"),
     LAMBDA("lambda"),
     FUNC("func"),
     COND("cond"),
@@ -23,11 +25,23 @@ public enum TokenType {
     QUOTE_TICK(compile("'")),
     NULL_LITERAL("null"),
     BOOLEAN_LITERAL(compile("false|true")),
-    NUMBER_LITERAL(compile("[+-]?\\d+(\\.\\d*)?")),
+    NUMBER_LITERAL(compile("[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE]\\d+)?")),
     STRING_LITERAL(compile("\"([^\"\\\\]|\\\\t|\\\\u|\\\\n|\\\\r|\\\\\")*\"")),
     IDENTIFIER(compile("[A-Za-z+\\-.><?=][A-Za-z\\d\\-.><?=]*")); // TODO
 
 
+    private static final HashSet<TokenType> specials = new HashSet<>(List.of(new TokenType[]{
+            SETQ,
+            LAMBDA,
+            FUNC,
+            COND,
+            WHILE,
+            PROG,
+            RETURN,
+            RETURN,
+            BREAK,
+            QUOTE,
+    }));
     private final Pattern pattern;
     private final String exactPattern;
 
@@ -67,25 +81,6 @@ public enum TokenType {
     }
 
     public boolean isSpecial() {
-        var specialTypes = new TokenType[]{
-                TokenType.SET,
-                TokenType.LAMBDA,
-                TokenType.FUNC,
-                TokenType.COND,
-                TokenType.WHILE,
-                TokenType.PROG,
-                TokenType.RETURN,
-                TokenType.RETURN,
-                TokenType.BREAK,
-                TokenType.QUOTE,
-        };
-
-        for (var specialType : specialTypes) {
-            if (this == specialType) {
-                return true;
-            }
-        }
-
-        return false;
+        return specials.contains(this);
     }
 }
