@@ -11,28 +11,30 @@ import com.inno.lips.core.parser.sexpr.SExpression;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.List;
 
 public class Repl {
     private final BufferedReader input;
-
-    public Repl(Reader input) {
-        this.input = new BufferedReader(input);
-    }
+    private final int inputNumber;
 
     public Repl() {
+        this.inputNumber = 0;
         this.input = new BufferedReader(new InputStreamReader(System.in));
     }
 
     public void run() throws IOException {
         while (true) {
-            runLine();
+            runExpression();
+            System.out.println();
         }
     }
 
-    private void runLine() throws IOException {
-        System.out.print(Chalk.on("> ").bold().magenta());
+    private String prompt() {
+        return Chalk.on("> ").bold().magenta().toString();
+    }
+
+    private void runExpression() throws IOException {
+        System.out.print(prompt());
         var line = input.readLine();
 
         if (line.isBlank()) {
@@ -47,7 +49,7 @@ public class Repl {
                 System.out.println(sExpression);
             }
         } catch (LexingException | ParseException e) {
-            System.err.println(e.show(line));
+            System.err.print(e.show(line));
         }
     }
 }
