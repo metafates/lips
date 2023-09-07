@@ -29,6 +29,10 @@ public final class Set extends SpecialForm {
             throw new InvalidSyntaxException(next.span(), "set expects symbol as identifier");
         }
 
+        if (symbol.getType().isSpecial()) {
+            throw new InvalidSyntaxException(symbol.span(), "symbol is reserved");
+        }
+
         return new Set(span, symbol, iter.next());
     }
 
