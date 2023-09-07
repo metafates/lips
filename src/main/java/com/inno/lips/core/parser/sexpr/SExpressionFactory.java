@@ -32,6 +32,7 @@ public class SExpressionFactory {
             case OPEN_PAREN -> {
                 List<SExpression> frame = new ArrayList<>();
 
+                // for the error
                 Token lastToken = null;
                 while (rest.hasNext()) {
                     var next = rest.next();
