@@ -5,19 +5,23 @@ import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.sexpr.SExpression;
 import com.inno.lips.core.parser.sexpr.SExpressionFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Parser {
-    public static SExpression parse(Iterator<Token> tokens) throws ParseException {
+    public static List<SExpression> parse(Iterator<Token> tokens) throws ParseException {
         if (!tokens.hasNext()) {
             throw new UnexpectedEOFException(Span.zero());
         }
 
-        SExpression root = SExpressionFactory.create(tokens);
+        List<SExpression> sExpressions = new ArrayList<>();
+
         while (tokens.hasNext()) {
-            root = root.join(SExpressionFactory.create(tokens));
+            var sExpression = SExpressionFactory.create(tokens);
+            sExpressions.add(sExpression);
         }
 
-        return root;
+        return sExpressions;
     }
 }

@@ -20,6 +20,7 @@ public class SpecialFormFactory {
             case SET -> Set.parse(span, tail);
             case LAMBDA -> Lambda.parse(span, tail);
             case FUNC -> Func.parse(span, tail);
+            case QUOTE -> Quote.parse(span, tail);
             default -> throw new NotImplementedException("not implemented");
         };
     }

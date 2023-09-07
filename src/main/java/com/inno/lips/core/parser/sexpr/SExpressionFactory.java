@@ -28,6 +28,10 @@ public class SExpressionFactory {
     }
 
     private static SExpression create(Span span, Token current, Iterator<Token> rest) throws ParseException {
+        return create(span, current, rest, false);
+    }
+
+    private static SExpression create(Span span, Token current, Iterator<Token> rest, boolean quoted) throws ParseException {
         return switch (current.type()) {
             case OPEN_PAREN -> {
                 List<SExpression> frame = new ArrayList<>();
@@ -41,10 +45,15 @@ public class SExpressionFactory {
                     if (next.type() == TokenType.CLOSE_PAREN) {
                         var sequenceSpan = current.span().join(next);
 
-                        yield SequenceFactory.create(sequenceSpan, frame);
+                        yield SequenceFactory.create(sequenceSpan, frame, quoted);
                     }
 
-                    frame.add(create(span, next, rest));
+                    var created = create(span, next, rest, quoted);
+                    if (!quoted && created instanceof Atom atom) {
+                        quoted = atom.getType() == TokenType.QUOTE;
+                    }
+
+                    frame.add(created);
                 }
 
                 if (lastToken == null) {
@@ -57,23 +66,21 @@ public class SExpressionFactory {
             default -> {
                 Atom atom = AtomFactory.create(current);
 
-                yield switch (atom.getType()) {
-                    case QUOTE_TICK -> expandQuoteMacro(atom.span(), rest);
-                    default -> atom;
-                };
+                if (atom.getType() != TokenType.QUOTE_TICK) {
+                    yield atom;
+                }
+
+                Symbol quote = new Symbol(current.span(), TokenType.QUOTE, "quote");
+
+                var next = rest.next();
+                SExpression toQuote = create(next.span(), next, rest, true);
+
+                List<SExpression> elements = new ArrayList<>();
+                elements.add(quote);
+                elements.add(toQuote);
+
+                yield SequenceFactory.create(quote.span().join(toQuote), elements, true);
             }
         };
-    }
-
-    private static Quote expandQuoteMacro(Span span, Iterator<Token> tokens) throws ParseException {
-        if (!tokens.hasNext()) {
-            // TODO: more verbose message
-            throw new UnexpectedEOFException(span);
-        }
-
-        var next = tokens.next();
-        SExpression toQuote = create(next.span(), next, tokens);
-
-        return Quote.parse(span.join(toQuote.span()), toQuote);
     }
 }

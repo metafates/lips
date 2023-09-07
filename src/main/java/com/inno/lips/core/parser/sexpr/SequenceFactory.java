@@ -1,6 +1,7 @@
 package com.inno.lips.core.parser.sexpr;
 
 import com.inno.lips.core.common.Span;
+import com.inno.lips.core.lexer.TokenType;
 import com.inno.lips.core.parser.ParseException;
 
 import java.util.ArrayList;
@@ -8,6 +9,10 @@ import java.util.List;
 
 public class SequenceFactory {
     public static Sequence create(Span span, List<SExpression> elements) throws ParseException {
+        return create(span, elements, false);
+    }
+
+    public static Sequence create(Span span, List<SExpression> elements, boolean quoted) throws ParseException {
         if (elements.isEmpty()) {
             return new Sequence(span);
         }
@@ -19,7 +24,7 @@ public class SequenceFactory {
                 processed.add(element);
             } else {
                 var sequence = (Sequence) element;
-                processed.add(create(sequence.span(), sequence.getElements()));
+                processed.add(create(sequence.span(), sequence.getElements(), quoted));
             }
         }
 
@@ -30,7 +35,9 @@ public class SequenceFactory {
         }
 
         if (head instanceof Symbol symbol && symbol.getType().isSpecial()) {
-            return SpecialFormFactory.create(span, symbol, tail);
+            if (!quoted || symbol.getType() == TokenType.QUOTE) {
+                return SpecialFormFactory.create(span, symbol, tail);
+            }
         }
 
         return new Sequence(span, processed);

@@ -15,7 +15,7 @@ public enum TokenType {
     COND("cond"),
     WHILE("while"),
     PROG("prog"),
-    //    QUOTE("quote"),
+    QUOTE("quote"),
     RETURN("return"),
     BREAK("break"),
     COMMENT(compile(";[^\n]*")),
@@ -76,7 +76,8 @@ public enum TokenType {
                 TokenType.PROG,
                 TokenType.RETURN,
                 TokenType.RETURN,
-                TokenType.BREAK
+                TokenType.BREAK,
+                TokenType.QUOTE,
         };
 
         for (var specialType : specialTypes) {
