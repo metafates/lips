@@ -58,6 +58,10 @@ public class Evaluator {
     }
 
     private static LipsObject evaluateSpecialForm(Scope scope, SpecialForm specialForm) throws EvaluationException {
+        if (specialForm instanceof Quote quote) {
+            return new LipsObject(quote.getBody());
+        }
+
         if (specialForm instanceof Lambda lambda) {
             return new Procedure(scope.inner(), lambda);
         }

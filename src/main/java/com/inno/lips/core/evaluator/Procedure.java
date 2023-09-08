@@ -9,21 +9,17 @@ import com.inno.lips.core.parser.sexpr.SExpression;
 import java.util.List;
 
 public final class Procedure extends LipsObject implements IProcedure {
-    private final Scope scope;
     private final IProcedure inner;
 
     public Procedure(IProcedure inner) {
-        this.scope = new Scope();
         this.inner = inner;
     }
 
     public Procedure(Scope scope, Lambda lambda) {
-        this.scope = scope;
         this.inner = fromParamsAndBody(scope, lambda.getParameters(), lambda.getBody());
     }
 
     public Procedure(Scope scope, Func func) {
-        this.scope = scope;
         this.inner = fromParamsAndBody(scope, func.getParameters(), func.getBody());
     }
 
@@ -54,7 +50,6 @@ public final class Procedure extends LipsObject implements IProcedure {
     }
 
     public LipsObject apply(List<LipsObject> arguments) throws EvaluationException {
-        assert inner != null;
         return inner.apply(arguments);
     }
 

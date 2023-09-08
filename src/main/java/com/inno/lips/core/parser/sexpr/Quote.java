@@ -27,6 +27,10 @@ public final class Quote extends SpecialForm {
         return parse(span, args.get(0));
     }
 
+    public SExpression getBody() {
+        return body;
+    }
+
     @Override
     public String AST() {
         return "Quote(%s)".formatted(body.AST());

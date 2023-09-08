@@ -1,9 +1,9 @@
 package com.inno.lips.core.evaluator;
 
 import com.inno.lips.core.common.Span;
-import com.inno.lips.core.parser.sexpr.BooleanLiteral;
-import com.inno.lips.core.parser.sexpr.NumberLiteral;
+import com.inno.lips.core.parser.sexpr.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Builtin {
@@ -12,6 +12,35 @@ class Builtin {
             List<String> strings = arguments.stream().map(LipsObject::toString).toList();
 
             System.out.println(String.join(" ", strings));
+            return new LipsObject();
+        });
+    }
+
+    private static Procedure printf() {
+        return new Procedure(arguments -> {
+            List<Object> literals = new ArrayList<>();
+
+            if (arguments.isEmpty()) {
+                throw new EvaluationException("printf expects at least one argument");
+            }
+
+            var iter = arguments.iterator();
+
+            if (!(iter.next().sExpression() instanceof StringLiteral format)) {
+                throw new EvaluationException("format must be a string");
+            }
+
+            while (iter.hasNext()) {
+                var expr = iter.next().sExpression();
+
+                if (!(expr instanceof Literal<?> literal)) {
+                    throw new EvaluationException("printf supports literals only");
+                }
+
+                literals.add(literal.getValue());
+            }
+
+            System.out.printf(format.getValue(), literals.toArray());
             return new LipsObject();
         });
     }
@@ -82,14 +111,69 @@ class Builtin {
         });
     }
 
+    private static Procedure car() {
+        return new Procedure(arguments -> {
+            if (arguments.size() != 1) {
+                // TODO: better message
+                throw new EvaluationException("1 argument expected");
+            }
+
+            var argument = arguments.get(0).sExpression();
+
+            if (!(argument instanceof Sequence sequence)) {
+                throw new EvaluationException("sequence expected");
+            }
+
+            var elements = sequence.getElements();
+
+            if (elements.isEmpty()) {
+                throw new EvaluationException("at least one element is expected");
+            }
+
+            return new LipsObject(elements.get(0));
+        });
+    }
+
+    private static Procedure cdr() {
+        return new Procedure(arguments -> {
+            if (arguments.size() != 1) {
+                // TODO: better message
+                throw new EvaluationException("1 argument expected");
+            }
+
+            var argument = arguments.get(0).sExpression();
+
+            if (!(argument instanceof Sequence sequence)) {
+                throw new EvaluationException("sequence expected");
+            }
+
+            var elements = sequence.getElements();
+
+            if (elements.isEmpty()) {
+                throw new EvaluationException("at least one element is expected");
+            }
+
+            if (elements.size() == 1) {
+                return new LipsObject(new Sequence(Span.zero()));
+            }
+
+            var newSequence = new Sequence(Span.zero(), elements.subList(1, elements.size()));
+
+            return new LipsObject(newSequence);
+        });
+    }
+
     public Scope scope() {
         var scope = new Scope();
 
         scope.put("println", println());
+        scope.put("printf", printf());
         scope.put("+", add());
         scope.put("-", sub());
         scope.put("=", equal());
         scope.put("not=", notEqual());
+        scope.put("car", car());
+        scope.put("cdr", cdr());
 
         return scope;
     }
