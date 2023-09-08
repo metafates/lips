@@ -29,14 +29,10 @@ public class SequenceFactory {
         }
 
         var head = processed.get(0);
-        List<SExpression> tail = new ArrayList<>();
-        if (processed.size() > 1) {
-            tail = processed.subList(1, processed.size());
-        }
 
         if (head instanceof Symbol symbol && symbol.getType().isSpecial()) {
             if (!quoted || symbol.getType() == TokenType.QUOTE) {
-                return SpecialFormFactory.create(span, symbol, tail);
+                return SpecialFormFactory.create(span, processed);
             }
         }
 
