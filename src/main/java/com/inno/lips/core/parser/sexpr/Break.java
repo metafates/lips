@@ -18,4 +18,9 @@ public final class Break extends SpecialForm {
 
         return new Break(span);
     }
+
+    @Override
+    public String AST() {
+        return "Break";
+    }
 }

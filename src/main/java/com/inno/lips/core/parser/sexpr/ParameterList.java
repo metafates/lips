@@ -24,11 +24,14 @@ public class ParameterList implements Node {
             throw new InvalidSyntaxException(sExpression.span(), "lambda accepts list as parameters");
         }
 
+        if (sequence instanceof SpecialForm) {
+            throw new InvalidSyntaxException(sExpression.span(), "special form inside function parameters");
+        }
+
         var parameters = new ParameterList();
 
-        for (SExpression element : sequence.getElements()) {
+        for (var element : sequence.getElements()) {
             var parameter = Parameter.parse(element);
-
             parameters.add(parameter);
         }
 
@@ -54,6 +57,8 @@ public class ParameterList implements Node {
     @Override
     public String AST() {
         List<String> strings = parameters.stream().map(Parameter::AST).toList();
-        return "Parameters(%s)".formatted(String.join(", ", strings));
+        String joined = String.join(", ", strings);
+
+        return "Parameters(%s)".formatted(joined);
     }
 }

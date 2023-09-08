@@ -28,6 +28,10 @@ public class Parameter extends Spannable implements Node {
     }
 
     public static Parameter parse(SExpression sExpression) throws ParseException {
+        if (sExpression instanceof SpecialForm) {
+            throw new InvalidSyntaxException(sExpression.span(), "special form inside function parameters");
+        }
+
         if (sExpression instanceof Symbol symbol) {
             return new Parameter(symbol.span(), symbol.getName());
         }
@@ -36,12 +40,16 @@ public class Parameter extends Spannable implements Node {
             List<SExpression> elements = sequence.getElements();
             if (elements.size() != 2) {
                 // TODO: better error message
-                throw new SpecialFormArityMismatchException(sequence.span(), "lambda param", 2, elements.size());
+                throw new SpecialFormArityMismatchException(sequence.span(), "function param", 2, elements.size());
             }
 
             if (!(elements.get(0) instanceof Symbol symbol)) {
                 // TODO: better error message
                 throw new InvalidSyntaxException(elements.get(0).span(), "symbol expected");
+            }
+
+            if (symbol.getType().isSpecial()) {
+                throw new InvalidSyntaxException(symbol.span(), "reserved symbol");
             }
 
             if (!(elements.get(1) instanceof Literal<?> literal)) {
@@ -52,7 +60,7 @@ public class Parameter extends Spannable implements Node {
             return new Parameter(sequence.span(), symbol.getName(), literal);
         }
 
-        throw new InvalidSyntaxException(sExpression.span(), "invalid lambda parameter");
+        throw new InvalidSyntaxException(sExpression.span(), "invalid parameter");
     }
 
     public String getName() {

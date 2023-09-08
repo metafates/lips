@@ -7,13 +7,13 @@ import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 import java.util.List;
 
 public final class While extends SpecialForm {
-    private final SExpression testExpression;
+    private final SExpression condition;
     private final List<SExpression> body;
 
-    private While(Span span, SExpression testExpression, List<SExpression> body) {
+    private While(Span span, SExpression condition, List<SExpression> body) {
         super(span);
 
-        this.testExpression = testExpression;
+        this.condition = condition;
         this.body = body;
     }
 
@@ -22,15 +22,15 @@ public final class While extends SpecialForm {
             throw new SpecialFormArityMismatchException(span, "while", 2, elements.size());
         }
 
-        var testExpression = elements.get(0);
+        var condition = elements.get(0);
         var body = elements.subList(1, elements.size());
 
-        return new While(span, testExpression, body);
+        return new While(span, condition, body);
     }
 
     @Override
     public String AST() {
         List<String> strings = body.stream().map(SExpression::AST).toList();
-        return "While(%s -> %s)".formatted(testExpression.AST(), String.join(", ", strings));
+        return "While(%s -> %s)".formatted(condition.AST(), String.join(", ", strings));
     }
 }

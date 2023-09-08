@@ -15,9 +15,19 @@ public final class Return extends SpecialForm {
         this.value = value;
     }
 
+    private Return(Span span) {
+        super(span);
+
+        this.value = null;
+    }
+
     public static Return parse(Span span, List<SExpression> elements) throws ParseException {
-        if (elements.size() != 1) {
-            throw new SpecialFormArityMismatchException(span, "return", 1, elements.size());
+        if (elements.size() > 1) {
+            throw new SpecialFormArityMismatchException(span, "return", 0, elements.size());
+        }
+
+        if (elements.isEmpty()) {
+            return new Return(span);
         }
 
         return new Return(span, elements.get(0));

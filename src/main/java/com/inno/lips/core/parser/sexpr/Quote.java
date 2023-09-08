@@ -31,4 +31,9 @@ public final class Quote extends SpecialForm {
     public String AST() {
         return "Quote(%s)".formatted(body.AST());
     }
+
+    @Override
+    public String toString() {
+        return "'%s".formatted(body);
+    }
 }
