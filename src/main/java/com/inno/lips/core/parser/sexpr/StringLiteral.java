@@ -23,6 +23,11 @@ public final class StringLiteral extends Literal<String> {
     }
 
     @Override
+    public String toString() {
+        return "\"%s\"".formatted(getValue());
+    }
+
+    @Override
     public boolean asBoolean() {
         return !getValue().isBlank();
     }

@@ -36,7 +36,7 @@ public final class Prog extends SpecialForm {
     public String AST() {
         List<String> strings = body.stream().map(Node::AST).toList();
 
-        return "Prog(%s -> %s)".formatted(bindings.AST(), String.join(" ", strings));
+        return "Prog(%s -> %s)".formatted(bindings.AST(), String.join(", ", strings));
     }
 
     public static class Binding extends Spannable implements Node {
