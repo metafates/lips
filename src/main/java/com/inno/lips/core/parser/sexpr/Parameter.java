@@ -7,7 +7,6 @@ import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Parameter extends Spannable implements Node {
     private final String name;
@@ -67,8 +66,12 @@ public class Parameter extends Spannable implements Node {
         return name;
     }
 
-    public Optional<Literal<?>> getDefaultValue() {
-        return Optional.ofNullable(defaultValue);
+    public Literal<?> getDefaultValue() {
+        return defaultValue;
+    }
+
+    public boolean hasDefault() {
+        return defaultValue != null;
     }
 
     @Override

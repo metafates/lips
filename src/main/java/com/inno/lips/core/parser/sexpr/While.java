@@ -28,6 +28,14 @@ public final class While extends SpecialForm {
         return new While(span, condition, body);
     }
 
+    public SExpression getCondition() {
+        return condition;
+    }
+
+    public List<SExpression> getBody() {
+        return body;
+    }
+
     @Override
     public String AST() {
         List<String> strings = body.stream().map(SExpression::AST).toList();

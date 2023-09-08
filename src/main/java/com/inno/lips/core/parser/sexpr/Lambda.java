@@ -28,6 +28,14 @@ public final class Lambda extends SpecialForm {
         return new Lambda(span, parameters, body);
     }
 
+    public List<Parameter> getParameters() {
+        return parameters.getParameters();
+    }
+
+    public SExpression getBody() {
+        return body;
+    }
+
     @Override
     public String AST() {
         return "Lambda(%s -> %s)".formatted(parameters.AST(), body.AST());

@@ -34,6 +34,18 @@ public final class Func extends SpecialForm {
         return new Func(span, identifier, parameters, body);
     }
 
+    public List<Parameter> getParameters() {
+        return parameters.getParameters();
+    }
+
+    public SExpression getBody() {
+        return body;
+    }
+
+    public Symbol getIdentifier() {
+        return identifier;
+    }
+
     @Override
     public String AST() {
         return "Func(%s, %s -> %s)".formatted(identifier.AST(), parameters.AST(), body.AST());

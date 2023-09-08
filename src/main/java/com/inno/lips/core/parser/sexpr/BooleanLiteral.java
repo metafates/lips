@@ -5,7 +5,7 @@ import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.lexer.TokenType;
 
 public final class BooleanLiteral extends Literal<Boolean> {
-    private BooleanLiteral(Span span, Boolean value) {
+    public BooleanLiteral(Span span, Boolean value) {
         super(span, TokenType.BOOLEAN_LITERAL, value);
     }
 

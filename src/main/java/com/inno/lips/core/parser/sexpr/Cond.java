@@ -29,6 +29,18 @@ public final class Cond extends SpecialForm {
         return new Cond(span, iter.next(), iter.next(), iter.next());
     }
 
+    public SExpression getCondition() {
+        return condition;
+    }
+
+    public SExpression getThenBranch() {
+        return thenBranch;
+    }
+
+    public SExpression getElseBranch() {
+        return elseBranch;
+    }
+
     @Override
     public String AST() {
         return "Cond(%s ? %s : %s)".formatted(condition.AST(), thenBranch.AST(), elseBranch.AST());

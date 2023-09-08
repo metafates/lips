@@ -38,13 +38,17 @@ public class ParameterList implements Node {
         return parameters;
     }
 
+    public List<Parameter> getParameters() {
+        return parameters;
+    }
+
     private void add(Parameter parameter) throws ParseException {
         if (names.contains(parameter.getName())) {
             // TODO: better message
             throw new ParseException(parameter.span(), "Duplicate parameter");
         }
 
-        if (parameter.getDefaultValue().isPresent()) {
+        if (parameter.hasDefault()) {
             parameterWithDefaultValueAppeared = true;
         } else if (parameterWithDefaultValueAppeared) {
             throw new ParseException(parameter.span(), "Non-default argument follows default argument");

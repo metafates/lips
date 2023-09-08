@@ -22,4 +22,9 @@ public final class Nil extends Atom {
     public boolean equals(Object obj) {
         return obj instanceof Nil;
     }
+
+    @Override
+    public String toString() {
+        return "nil";
+    }
 }

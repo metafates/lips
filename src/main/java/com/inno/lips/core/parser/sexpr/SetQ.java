@@ -41,6 +41,14 @@ public final class SetQ extends SpecialForm {
         return new SetQ(span, symbol, value);
     }
 
+    public Symbol getSymbol() {
+        return symbol;
+    }
+
+    public SExpression getValue() {
+        return value;
+    }
+
     @Override
     public String AST() {
         return "Set(%s, %s)".formatted(symbol.AST(), value.AST());
