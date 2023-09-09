@@ -1,7 +1,5 @@
 package com.inno.lips.core.common;
 
-import com.github.tomaslanger.chalk.Chalk;
-
 public class Span {
     private final int start;
     private final int end;
@@ -68,7 +66,7 @@ public class Span {
                     .append(lines.get(startPos.line()))
                     .append('\n')
                     .append(pad)
-                    .append(Chalk.on(underline).bold().yellow())
+                    .append(underline)
                     .append('\n');
 
             return builder.toString();
@@ -78,7 +76,7 @@ public class Span {
 
         for (var line : errorLines) {
             builder
-                    .append(Chalk.on("|").bold().yellow())
+                    .append("|")
                     .append(' ')
                     .append(line)
                     .append('\n');

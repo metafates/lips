@@ -1,48 +1,53 @@
 package com.inno.lips.core.parser.sexpr;
 
 import com.inno.lips.core.common.Span;
+import com.inno.lips.core.parser.InvalidSyntaxException;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Cond extends SpecialForm {
-    private final SExpression condition;
-    private final SExpression thenBranch;
-    private final SExpression elseBranch;
+    private final List<Branch> branches;
 
-    private Cond(Span span, SExpression condition, SExpression thenBranch, SExpression elseBranch) {
+    private Cond(Span span, List<Branch> branches) {
         super(span);
 
-        this.condition = condition;
-        this.thenBranch = thenBranch;
-        this.elseBranch = elseBranch;
+        this.branches = branches;
     }
 
     public static Cond parse(Span span, List<SExpression> elements) throws ParseException {
-        if (elements.size() != 3) {
-            throw new SpecialFormArityMismatchException(span, "cond", 3, elements.size());
+        if (elements.isEmpty()) {
+            throw new SpecialFormArityMismatchException(span, "cond", 1, 0);
         }
 
-        var iter = elements.iterator();
+        List<Branch> branches = new ArrayList<>();
 
-        return new Cond(span, iter.next(), iter.next(), iter.next());
+        for (var element : elements) {
+            branches.add(Branch.parse(element));
+        }
+
+        return new Cond(span, branches);
     }
 
-    public SExpression getCondition() {
-        return condition;
+    public List<Branch> getBranches() {
+        return branches;
     }
 
-    public SExpression getThenBranch() {
-        return thenBranch;
-    }
+    public record Branch(SExpression predicate, SExpression body) {
+        public static Branch parse(SExpression sExpression) throws ParseException {
+            if (!(sExpression instanceof Sequence sequence)) {
+                throw new InvalidSyntaxException(sExpression.span(), "sequence expected");
+            }
 
-    public SExpression getElseBranch() {
-        return elseBranch;
-    }
+            var elements = sequence.getElements();
 
-    @Override
-    public String AST() {
-        return "Cond(%s ? %s : %s)".formatted(condition.AST(), thenBranch.AST(), elseBranch.AST());
+            if (elements.size() != 2) {
+                throw new SpecialFormArityMismatchException(sequence.span(), "cond-predicate", 2, elements.size());
+            }
+
+            return new Branch(elements.get(0), elements.get(1));
+        }
     }
 }

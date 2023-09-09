@@ -29,6 +29,7 @@ public class SpecialFormFactory {
             case WHILE -> While.parse(span, arguments);
             case RETURN -> Return.parse(span, arguments);
             case BREAK -> Break.parse(span, arguments);
+            case IF -> If.parse(span, arguments);
             case COND -> Cond.parse(span, arguments);
             case PROG -> Prog.parse(span, arguments);
             default -> throw new NotImplementedException("not implemented");

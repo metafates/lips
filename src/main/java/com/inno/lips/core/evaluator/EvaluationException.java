@@ -1,7 +1,5 @@
 package com.inno.lips.core.evaluator;
 
-import com.github.tomaslanger.chalk.Chalk;
-
 public class EvaluationException extends Exception {
     private final Frame frame;
 
@@ -16,8 +14,12 @@ public class EvaluationException extends Exception {
     }
 
     public String trace() {
-        return Chalk.on(getMessage()).red().bold().toString() +
+
+        String builder = getMessage() +
                 '\n' +
-                Chalk.on(frame.trace()).gray();
+                "Stack trace:\n\n" +
+                frame.trace();
+
+        return builder;
     }
 }

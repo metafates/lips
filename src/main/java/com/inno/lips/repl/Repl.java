@@ -1,6 +1,6 @@
 package com.inno.lips.repl;
 
-import com.github.tomaslanger.chalk.Chalk;
+import com.inno.lips.core.common.Span;
 import com.inno.lips.core.evaluator.Environment;
 import com.inno.lips.core.evaluator.EvaluationException;
 import com.inno.lips.core.evaluator.Evaluator;
@@ -11,62 +11,94 @@ import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.Parser;
 import com.inno.lips.core.parser.sexpr.SExpression;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Size;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.InfoCmp;
+import org.jline.utils.OSUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 
 public class Repl {
     private final Environment environment;
-    private final BufferedReader input;
-    private final int inputNumber;
+    private final LineReader reader;
+    private final String prompt = "lips-repl> ";
 
-    public Repl() {
-        this.inputNumber = 0;
+    public Repl() throws IOException {
         this.environment = new Environment();
-        this.input = new BufferedReader(new InputStreamReader(System.in));
+
+        Terminal terminal = TerminalBuilder.builder().build();
+
+        if (terminal.getWidth() == 0 || terminal.getHeight() == 0) {
+            terminal.setSize(new Size(120, 40));
+        }
+
+        Thread executeThread = Thread.currentThread();
+        terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
+
+        this.reader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .variable(LineReader.SECONDARY_PROMPT_PATTERN, "%M%P > ")
+                .variable(LineReader.INDENTATION, 2)
+                .variable(LineReader.LIST_MAX, 100)
+                .build();
+
+        if (OSUtils.IS_WINDOWS) {
+            reader.setVariable(LineReader.BLINK_MATCHING_PAREN, 0);
+        }
     }
 
-    public void run() throws IOException {
+    private static Frame frame(Span span) {
+        return new Frame(span, "<repl>");
+    }
+
+    private Terminal terminal() {
+        return reader.getTerminal();
+    }
+
+    private void clearTerminal() {
+        terminal().puts(InfoCmp.Capability.clear_screen);
+        terminal().flush();
+    }
+
+    public void loop() throws IOException {
         while (true) {
-            runExpression();
-            System.out.println();
-        }
-    }
-
-    private String prompt() {
-        return Chalk.on("> ").bold().magenta().toString();
-    }
-
-    private void runExpression() throws IOException {
-        System.out.print(prompt());
-        var line = input.readLine();
-
-        if (line.isBlank()) {
-            return;
-        }
-        try {
-            List<Token> tokens = Lexer.tokenize(line);
-            var sexpr = Parser.parse(tokens.iterator());
-
-            for (SExpression sExpression : sexpr) {
-//                System.out.print("AST: ");
-//                System.out.println(sExpression.AST());
-//
-//                System.out.print("REPR: ");
-//                System.out.println(sExpression);
-
-                var res = Evaluator.evaluate(new Frame(sExpression.span(), "<repl>"), environment, sExpression);
-//                System.out.print("EVAL: ");
-                System.out.println(Chalk.on(res.toString()).green());
+            String line;
+            try {
+                line = reader.readLine(prompt);
+            } catch (UserInterruptException | EndOfFileException e) {
+                break;
             }
-        } catch (LexingException | ParseException e) {
-            System.out.println();
-            System.err.print(e.show(line));
-        } catch (EvaluationException e) {
-            System.out.println();
-            System.out.print(e.trace());
+
+            if (line.isBlank()) {
+                continue;
+            }
+
+            if (line.trim().equals(":clear")) {
+                clearTerminal();
+                continue;
+            }
+
+            try {
+                List<Token> tokens = Lexer.tokenize(line);
+                var sexpr = Parser.parse(tokens.iterator());
+
+                for (SExpression sExpression : sexpr) {
+                    var res = Evaluator.evaluate(frame(sExpression.span()), environment, sExpression);
+                    System.out.println(res.toString());
+                }
+            } catch (LexingException | ParseException e) {
+                System.out.println();
+                System.err.print(e.show(line));
+            } catch (EvaluationException e) {
+                System.out.println();
+                System.out.print(e.trace());
+            }
         }
     }
 }

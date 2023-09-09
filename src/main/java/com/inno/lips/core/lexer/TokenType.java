@@ -15,6 +15,7 @@ public enum TokenType {
     LAMBDA("lambda"),
     FUNC("func"),
     COND("cond"),
+    IF("if"),
     WHILE("while"),
     PROG("prog"),
     QUOTE("quote"),
@@ -38,6 +39,7 @@ public enum TokenType {
             WHILE,
             PROG,
             RETURN,
+            IF,
             BREAK,
             QUOTE,
     }));

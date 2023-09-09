@@ -1,10 +1,9 @@
 package com.inno.lips.core.evaluator;
 
 import com.inno.lips.core.common.Span;
-import com.inno.lips.core.parser.sexpr.BooleanLiteral;
-import com.inno.lips.core.parser.sexpr.NumberLiteral;
-import com.inno.lips.core.parser.sexpr.Sequence;
+import com.inno.lips.core.parser.sexpr.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Builtin {
@@ -19,6 +18,10 @@ class Builtin {
 
     private static Procedure add() {
         return new Procedure((frame, arguments) -> {
+            if (arguments.size() < 2) {
+                throw new ArityMismatchException(frame, 2, arguments.size());
+            }
+
             float sum = 0;
 
             for (var argument : arguments) {
@@ -35,17 +38,29 @@ class Builtin {
 
     private static Procedure sub() {
         return new Procedure((frame, arguments) -> {
-            float sum = 0;
+            if (arguments.size() < 2) {
+                throw new ArityMismatchException(frame, 2, arguments.size());
+            }
 
-            for (var argument : arguments) {
-                if (!(argument.sExpression() instanceof NumberLiteral numberLiteral)) {
+            var iter = arguments.iterator();
+            var first = iter.next();
+
+            if (!(first.sExpression() instanceof NumberLiteral number)) {
+                throw new TypeException(frame, "number", first);
+            }
+
+            float res = number.getValue();
+
+            while (iter.hasNext()) {
+                var argument = iter.next();
+                if (!(argument.sExpression() instanceof NumberLiteral sub)) {
                     throw new TypeException(frame, "number", argument);
                 }
 
-                sum -= numberLiteral.getValue();
+                res -= sub.getValue();
             }
 
-            return new LipsObject(new NumberLiteral(new Span(), sum));
+            return new LipsObject(new NumberLiteral(new Span(), res));
         });
     }
 
@@ -145,6 +160,30 @@ class Builtin {
         });
     }
 
+    private static Procedure cons() {
+        return new Procedure(((frame, arguments) -> {
+            if (arguments.size() != 2) {
+                throw new ArityMismatchException(frame, 2, arguments.size());
+            }
+
+            var left = arguments.get(0).sExpression();
+            var right = arguments.get(1).sExpression();
+
+            List<SExpression> list = new ArrayList<>();
+
+            list.add(left);
+
+            if (right instanceof Sequence sequence) {
+                list.addAll(sequence.getElements());
+            } else if (!(right instanceof Nil)) {
+                list.add(right);
+            }
+
+
+            return new LipsObject(new Sequence(left.span().join(right), list));
+        }));
+    }
+
     public Environment scope() {
         var scope = new Environment();
 
@@ -156,6 +195,7 @@ class Builtin {
         scope.put("car", car());
         scope.put("cdr", cdr());
         scope.put("not", not());
+        scope.put("cons", cons());
 
         return scope;
     }

@@ -8,6 +8,6 @@ public class App {
     public static void main(String[] args) throws IOException {
         var repl = new Repl();
 
-        repl.run();
+        repl.loop();
     }
 }

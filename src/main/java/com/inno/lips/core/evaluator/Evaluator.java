@@ -56,6 +56,10 @@ public class Evaluator {
             return environment.get(frame, symbol);
         }
 
+        if (atom instanceof Nil nil) {
+            return new LipsObject(nil);
+        }
+
         throw new UnsupportedOperationException(frame);
     }
 
@@ -84,25 +88,41 @@ public class Evaluator {
             return new LipsObject();
         }
 
-        if (specialForm instanceof Cond cond) {
-            var condition = cond.getCondition();
-            var condFrame = frame.inner(condition.span(), "cond");
+        if (specialForm instanceof If anIf) {
+            var predicate = anIf.getPredicate();
+            var condFrame = frame.inner(predicate.span(), "cond");
 
-            if (evaluate(condFrame, environment, condition).sExpression().asBoolean()) {
-                var branch = cond.getThenBranch();
+            if (evaluate(condFrame, environment, predicate).sExpression().asBoolean()) {
+                var branch = anIf.getThenBranch();
                 return evaluate(condFrame.inner(branch.span(), "then"), environment, branch);
             }
 
-            var branch = cond.getElseBranch();
+            var branch = anIf.getElseBranch();
             return evaluate(frame.inner(branch.span(), "else"), environment, branch);
         }
 
+        if (specialForm instanceof Cond cond) {
+            var branches = cond.getBranches();
+
+            var condFrame = frame.inner(cond.span(), "cond");
+            for (var branch : branches) {
+                var predicate = branch.predicate();
+                var body = branch.body();
+                var branchFrame = condFrame.inner(predicate.span(), "branch-predicate");
+
+                if (evaluate(branchFrame, environment, predicate).sExpression().asBoolean()) {
+                    var bodyFrame = branchFrame.inner(body.span(), "branch-body");
+                    return evaluate(bodyFrame, environment, body);
+                }
+            }
+        }
+
         if (specialForm instanceof While whileForm) {
-            var condition = whileForm.getCondition();
+            var predicate = whileForm.getPredicate();
             var body = whileForm.getBody();
 
-            var whileFrame = frame.inner(condition.span(), "while");
-            while (evaluate(whileFrame, environment, condition).sExpression().asBoolean()) {
+            var whileFrame = frame.inner(predicate.span(), "while");
+            while (evaluate(whileFrame, environment, predicate).sExpression().asBoolean()) {
                 for (var expression : body) {
                     evaluate(whileFrame.inner(expression.span(), "while-body"), environment, expression);
                 }
