@@ -1,5 +1,8 @@
 package com.inno.lips.core.common;
 
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Span {
     private final int start;
     private final int end;
@@ -62,6 +65,8 @@ public class Span {
             var pad = " ".repeat(Math.max(0, startPos.column()));
             var underline = "^".repeat(Math.max(0, endPos.column() - startPos.column() + 1));
 
+            underline = ansi().fg(YELLOW).a(underline).reset().toString();
+
             builder
                     .append(lines.get(startPos.line()))
                     .append('\n')
@@ -76,7 +81,7 @@ public class Span {
 
         for (var line : errorLines) {
             builder
-                    .append("|")
+                    .append(ansi().fg(YELLOW).a("|").reset())
                     .append(' ')
                     .append(line)
                     .append('\n');

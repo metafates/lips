@@ -1,5 +1,8 @@
 package com.inno.lips.core.evaluator;
 
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class EvaluationException extends Exception {
     private final Frame frame;
 
@@ -15,11 +18,9 @@ public class EvaluationException extends Exception {
 
     public String trace() {
 
-        String builder = getMessage() +
+        return ansi().fg(RED).bold().a(getMessage()).reset().toString() +
                 '\n' +
                 "Stack trace:\n\n" +
                 frame.trace();
-
-        return builder;
     }
 }

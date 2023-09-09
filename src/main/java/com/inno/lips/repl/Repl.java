@@ -15,6 +15,7 @@ import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.UserInterruptException;
+import org.jline.reader.impl.DefaultHighlighter;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -24,10 +25,14 @@ import org.jline.utils.OSUtils;
 import java.io.IOException;
 import java.util.List;
 
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Repl {
     private final Environment environment;
     private final LineReader reader;
-    private final String prompt = "lips-repl> ";
+    private final String prompt = ansi().fg(GREEN).a("lips-repl> ").reset().toString();
 
     public Repl() throws IOException {
         this.environment = new Environment();
@@ -46,6 +51,7 @@ public class Repl {
                 .variable(LineReader.SECONDARY_PROMPT_PATTERN, "%M%P > ")
                 .variable(LineReader.INDENTATION, 2)
                 .variable(LineReader.LIST_MAX, 100)
+                .highlighter(new DefaultHighlighter())
                 .build();
 
         if (OSUtils.IS_WINDOWS) {
@@ -66,7 +72,7 @@ public class Repl {
         terminal().flush();
     }
 
-    public void loop() throws IOException {
+    public void loop() {
         while (true) {
             String line;
             try {
@@ -90,7 +96,7 @@ public class Repl {
 
                 for (SExpression sExpression : sexpr) {
                     var res = Evaluator.evaluate(frame(sExpression.span()), environment, sExpression);
-                    System.out.println(res.toString());
+                    System.out.println(ansi().fg(CYAN).a(res).reset());
                 }
             } catch (LexingException | ParseException e) {
                 System.out.println();

@@ -1,0 +1,4 @@
+(func greet (name (greeting "Hello,")) (println greeting name))
+
+(greet "World")
+(greet "John" "Hey")

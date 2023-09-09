@@ -72,6 +72,10 @@ public class SExpressionFactory {
 
                 Symbol quote = new Symbol(current.span(), TokenType.QUOTE, "quote");
 
+                if (!rest.hasNext()) {
+                    throw new UnexpectedEOFException(quote.span());
+                }
+
                 var next = rest.next();
                 SExpression toQuote = create(next.span(), next, rest, true);
 

@@ -52,6 +52,11 @@
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.jcommander</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.83</version>
+        </dependency>
     </dependencies>
 
     <build>

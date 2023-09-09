@@ -193,12 +193,11 @@ class Builtin {
 
             list.add(left);
 
+
             if (right instanceof Sequence sequence) {
                 list.addAll(sequence.getElements());
             } else if (!(right instanceof Nil)) {
-                list.add(right);
-            } else {
-                throw new TypeException(frame, "sequence or list", arguments.get(1));
+                throw new TypeException(frame, "sequence", arguments.get(1));
             }
 
 

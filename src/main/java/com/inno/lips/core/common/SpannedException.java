@@ -1,5 +1,8 @@
 package com.inno.lips.core.common;
 
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.ansi;
+
 public abstract class SpannedException extends Exception {
     private final Span span;
 
@@ -25,10 +28,10 @@ public abstract class SpannedException extends Exception {
             line = "Error on lines %d - %d".formatted(startPos.line() + 1, endPos.line() + 1);
         }
 
-        builder.append(line);
+        builder.append(ansi().fg(RED).a(line).reset());
         builder
                 .append('\n')
-                .append(getMessage())
+                .append(ansi().fg(RED).a(getMessage()).reset())
                 .append("\n\n")
                 .append(span.show(source));
 
