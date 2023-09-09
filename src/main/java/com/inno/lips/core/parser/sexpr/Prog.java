@@ -32,6 +32,14 @@ public final class Prog extends SpecialForm {
         return new Prog(span, bindings, body);
     }
 
+    public List<Binding> getBindings() {
+        return bindings.map.values().stream().toList();
+    }
+
+    public List<SExpression> getBody() {
+        return body;
+    }
+
     @Override
     public String AST() {
         List<String> strings = body.stream().map(Node::AST).toList();
@@ -63,6 +71,14 @@ public final class Prog extends SpecialForm {
             }
 
             return new Binding(span, symbol.getName(), elements.get(1));
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public SExpression getValue() {
+            return value;
         }
 
         @Override

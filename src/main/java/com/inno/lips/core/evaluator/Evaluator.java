@@ -124,11 +124,44 @@ public class Evaluator {
             var whileFrame = frame.inner(predicate.span(), "while");
             while (evaluate(whileFrame, environment, predicate).sExpression().asBoolean()) {
                 for (var expression : body) {
+                    if (expression instanceof Break) {
+                        return new LipsObject();
+                    }
+
+                    if (expression instanceof Return ret) {
+                        return new LipsObject(ret.getValue());
+                    }
+
                     evaluate(whileFrame.inner(expression.span(), "while-body"), environment, expression);
                 }
             }
 
             return new LipsObject();
+        }
+
+        if (specialForm instanceof Prog prog) {
+            var bindings = prog.getBindings();
+
+            var progEnv = environment.inner();
+            var progFrame = frame.inner(prog.span(), "prog");
+
+            for (var binding : bindings) {
+                var name = binding.getName();
+                var value = evaluate(progFrame.inner(binding.span(), name), environment, binding.getValue());
+
+                progEnv.put(name, value);
+            }
+
+            LipsObject result = new LipsObject();
+            for (var element : prog.getBody()) {
+                if (element instanceof Return ret) {
+                    return new LipsObject(ret.getValue());
+                }
+
+                result = evaluate(progFrame, progEnv, element);
+            }
+
+            return result;
         }
 
         throw new UnsupportedOperationException(frame);

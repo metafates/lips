@@ -33,6 +33,10 @@ public final class Return extends SpecialForm {
         return new Return(span, elements.get(0));
     }
 
+    public SExpression getValue() {
+        return value;
+    }
+
     @Override
     public String AST() {
         return "Return(%s)".formatted(value.AST());
