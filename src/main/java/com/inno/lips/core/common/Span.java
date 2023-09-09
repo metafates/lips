@@ -5,19 +5,32 @@ import com.github.tomaslanger.chalk.Chalk;
 public class Span {
     private final int start;
     private final int end;
+    private final boolean virtual;
 
     public Span(int start, int end) {
         this.start = start;
         this.end = end;
+        this.virtual = false;
     }
 
     public Span(int position) {
         this.start = position;
         this.end = position;
+        this.virtual = false;
+    }
+
+    public Span() {
+        this.virtual = true;
+        this.start = -1;
+        this.end = -1;
     }
 
     public static Span zero() {
         return new Span(0, 0);
+    }
+
+    public boolean isVirtual() {
+        return virtual;
     }
 
     public boolean isSingle() {

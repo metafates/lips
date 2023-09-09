@@ -4,5 +4,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface IProcedure {
-    LipsObject apply(List<LipsObject> arguments) throws EvaluationException;
+    LipsObject apply(Frame frame, List<LipsObject> arguments) throws EvaluationException;
 }

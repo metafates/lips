@@ -1,9 +1,10 @@
 package com.inno.lips.repl;
 
 import com.github.tomaslanger.chalk.Chalk;
+import com.inno.lips.core.evaluator.Environment;
 import com.inno.lips.core.evaluator.EvaluationException;
 import com.inno.lips.core.evaluator.Evaluator;
-import com.inno.lips.core.evaluator.Scope;
+import com.inno.lips.core.evaluator.Frame;
 import com.inno.lips.core.lexer.Lexer;
 import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
@@ -17,13 +18,13 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class Repl {
-    private final Scope scope;
+    private final Environment environment;
     private final BufferedReader input;
     private final int inputNumber;
 
     public Repl() {
         this.inputNumber = 0;
-        this.scope = new Scope();
+        this.environment = new Environment();
         this.input = new BufferedReader(new InputStreamReader(System.in));
     }
 
@@ -56,14 +57,16 @@ public class Repl {
 //                System.out.print("REPR: ");
 //                System.out.println(sExpression);
 
-                var res = Evaluator.evaluate(scope, sExpression);
+                var res = Evaluator.evaluate(new Frame(sExpression.span(), "<repl>"), environment, sExpression);
 //                System.out.print("EVAL: ");
                 System.out.println(Chalk.on(res.toString()).green());
             }
         } catch (LexingException | ParseException e) {
+            System.out.println();
             System.err.print(e.show(line));
         } catch (EvaluationException e) {
-            System.err.println(e.getMessage());
+            System.out.println();
+            System.out.print(e.trace());
         }
     }
 }
