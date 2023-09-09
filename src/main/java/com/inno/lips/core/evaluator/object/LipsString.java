@@ -14,5 +14,14 @@ public final class LipsString extends LipsLiteral<String> {
     public String type() {
         return "string";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LipsString lipsString) {
+            return getValue().equals(lipsString.getValue());
+        }
+
+        return false;
+    }
 }
 

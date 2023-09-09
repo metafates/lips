@@ -30,4 +30,9 @@ public final class LipsNil extends LipsObject {
     public String type() {
         return "nil";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof LipsNil;
+    }
 }

@@ -18,4 +18,13 @@ public final class LipsNumber extends LipsLiteral<Float> {
     public String type() {
         return "number";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LipsNumber number) {
+            return getValue().equals(number.getValue());
+        }
+
+        return false;
+    }
 }

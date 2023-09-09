@@ -39,4 +39,13 @@ public final class LipsSymbol extends LipsObject {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LipsSymbol symbol) {
+            return name.equals(symbol.name);
+        }
+
+        return false;
+    }
 }

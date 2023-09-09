@@ -72,4 +72,27 @@ public final class LipsSeq extends LipsObject {
         List<String> strings = elements.stream().map(String::valueOf).toList();
         return "(%s)".formatted(String.join(" ", strings));
     }
+
+    public int size() {
+        return getElements().size();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof LipsSeq seq)) {
+            return false;
+        }
+
+        if (size() != seq.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < size(); i++) {
+            if (!getElements().get(i).equals(seq.getElements().get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
