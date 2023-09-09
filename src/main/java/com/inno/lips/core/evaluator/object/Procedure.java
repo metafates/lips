@@ -1,6 +1,7 @@
-package com.inno.lips.core.evaluator;
+package com.inno.lips.core.evaluator.object;
 
 
+import com.inno.lips.core.evaluator.*;
 import com.inno.lips.core.parser.sexpr.Func;
 import com.inno.lips.core.parser.sexpr.Lambda;
 import com.inno.lips.core.parser.sexpr.Parameter;
@@ -44,7 +45,7 @@ public final class Procedure extends LipsObject implements IProcedure {
 
             for (int i = givenArity; i < requiredArity + defaultsArity; i++) {
                 var param = parameters.get(i);
-                var value = new LipsObject(param.getDefaultValue());
+                var value = LipsObjectFactory.create(param.getDefaultValue());
                 environment.put(param.getName(), value);
             }
 
@@ -57,7 +58,22 @@ public final class Procedure extends LipsObject implements IProcedure {
     }
 
     @Override
+    public boolean asBoolean() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "<function>";
+    }
+
+    @Override
+    public LipsObject evaluate(Frame frame, Environment environment) throws EvaluationException {
+        return this;
+    }
+
+    @Override
+    public String type() {
+        return "function";
     }
 }

@@ -1,5 +1,7 @@
 package com.inno.lips.core.evaluator;
 
+import com.inno.lips.core.evaluator.object.LipsObject;
+import com.inno.lips.core.evaluator.object.LipsSymbol;
 import com.inno.lips.core.parser.sexpr.Symbol;
 
 import java.util.HashMap;
@@ -32,7 +34,7 @@ public class Environment {
         put(symbol.getName(), value);
     }
 
-    public LipsObject get(Frame frame, Symbol symbol) throws UndefinedNameException {
+    public LipsObject get(Frame frame, LipsSymbol symbol) throws UndefinedNameException {
         return get(frame, symbol.getName());
     }
 

@@ -1,10 +1,10 @@
 package com.inno.lips.core.evaluator;
 
-import com.inno.lips.core.common.Span;
-import com.inno.lips.core.parser.sexpr.*;
+import com.inno.lips.core.evaluator.object.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 class Builtin {
     private static Procedure println() {
@@ -12,75 +12,78 @@ class Builtin {
             List<String> strings = arguments.stream().map(LipsObject::toString).toList();
 
             System.out.println(String.join(" ", strings));
-            return new LipsObject();
+            return LipsNil.instance;
         });
+    }
+
+    private static Procedure numericOp(int minArity, Function<List<Float>, Float> op) {
+        return new Procedure(((frame, arguments) -> {
+            if (arguments.size() < minArity) {
+                throw new ArityMismatchException(frame, minArity, arguments.size());
+            }
+
+            List<Float> numbers = new ArrayList<>();
+
+            for (var argument : arguments) {
+                if (!(argument instanceof LipsNumber number)) {
+                    throw new TypeException(frame, "number", argument);
+                }
+
+                numbers.add(number.getValue());
+            }
+
+            return new LipsNumber(op.apply(numbers));
+        }));
     }
 
     private static Procedure add() {
-        return new Procedure((frame, arguments) -> {
-            if (arguments.size() < 2) {
-                throw new ArityMismatchException(frame, 2, arguments.size());
-            }
-
-            float sum = 0;
-
-            for (var argument : arguments) {
-                if (!(argument.sExpression() instanceof NumberLiteral numberLiteral)) {
-                    throw new TypeException(frame, "number", argument);
-                }
-
-                sum += numberLiteral.getValue();
-            }
-
-            return new LipsObject(new NumberLiteral(new Span(), sum));
-        });
+        return numericOp(2, nums -> nums.stream().reduce(0f, Float::sum));
     }
 
     private static Procedure sub() {
-        return new Procedure((frame, arguments) -> {
-            if (arguments.size() < 2) {
-                throw new ArityMismatchException(frame, 2, arguments.size());
+        return numericOp(1, nums -> {
+            if (nums.size() == 1) {
+                return -1 * nums.get(0);
             }
 
-            var iter = arguments.iterator();
-            var first = iter.next();
-
-            if (!(first.sExpression() instanceof NumberLiteral number)) {
-                throw new TypeException(frame, "number", first);
-            }
-
-            float res = number.getValue();
+            var iter = nums.iterator();
+            float res = iter.next();
 
             while (iter.hasNext()) {
-                var argument = iter.next();
-                if (!(argument.sExpression() instanceof NumberLiteral sub)) {
-                    throw new TypeException(frame, "number", argument);
-                }
-
-                res -= sub.getValue();
+                res -= iter.next();
             }
 
-            return new LipsObject(new NumberLiteral(new Span(), res));
+            return res;
         });
     }
 
     private static Procedure times() {
-        return new Procedure((frame, arguments) -> {
-            if (arguments.size() < 2) {
-                throw new ArityMismatchException(frame, 2, arguments.size());
+        return numericOp(2, nums -> nums.stream().reduce(1f, (a, b) -> a * b));
+    }
+
+    private static Procedure divide() {
+        return numericOp(2, nums -> {
+            var iter = nums.iterator();
+            var res = iter.next();
+
+            while (iter.hasNext()) {
+                res /= iter.next();
             }
 
-            float product = 1;
+            return res;
+        });
+    }
 
-            for (var argument : arguments) {
-                if (!(argument.sExpression() instanceof NumberLiteral numberLiteral)) {
-                    throw new TypeException(frame, "number", argument);
-                }
+    private static Procedure pow() {
+        return numericOp(2, nums -> {
+            var iter = nums.iterator();
+            var res = iter.next();
 
-                product *= numberLiteral.getValue();
+            while (iter.hasNext()) {
+                res = (float) Math.pow(res, iter.next());
             }
 
-            return new LipsObject(new NumberLiteral(new Span(), product));
+            return res;
         });
     }
 
@@ -97,26 +100,25 @@ class Builtin {
             while (iter.hasNext()) {
                 var current = iter.next();
 
-                if (!prev.sExpression().equals(current.sExpression())) {
-                    return new LipsObject(new BooleanLiteral(new Span(), false));
+                if (!prev.equals(current)) {
+                    return new LipsBoolean(false);
                 }
 
                 prev = current;
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), true));
+            return new LipsBoolean(true);
         });
     }
 
     private static Procedure notEqual() {
         return new Procedure((frame, arguments) -> {
-            var res = (BooleanLiteral) equal().apply(frame, arguments).sExpression();
-
-            return new LipsObject(new BooleanLiteral(res.span(), !res.getValue()));
+            var res = (LipsBoolean) equal().apply(frame, arguments);
+            return res.inversed();
         });
     }
 
-    private static Procedure car() {
+    private static Procedure head() {
         return new Procedure((frame, arguments) -> {
             if (arguments.size() != 1) {
                 // TODO: better message
@@ -125,21 +127,21 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (!(argument.sExpression() instanceof Sequence sequence)) {
+            if (!(argument instanceof LipsSeq seq)) {
                 throw new TypeException(frame, "sequence", argument);
             }
 
-            var elements = sequence.getElements();
+            var elements = seq.getElements();
 
             if (elements.isEmpty()) {
                 throw new ArityMismatchException(frame, 1, 0);
             }
 
-            return new LipsObject(elements.get(0));
+            return elements.get(0);
         });
     }
 
-    private static Procedure cdr() {
+    private static Procedure tail() {
         return new Procedure((frame, arguments) -> {
             if (arguments.size() != 1) {
                 // TODO: better message
@@ -148,23 +150,21 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (!(argument.sExpression() instanceof Sequence sequence)) {
+            if (!(argument instanceof LipsSeq seq)) {
                 throw new TypeException(frame, "sequence", argument);
             }
 
-            var elements = sequence.getElements();
+            var elements = seq.getElements();
 
             if (elements.isEmpty()) {
                 throw new ArityMismatchException(frame, 1, 0);
             }
 
             if (elements.size() == 1) {
-                return new LipsObject(new Sequence(new Span()));
+                return new LipsSeq();
             }
 
-            var newSequence = new Sequence(new Span(), elements.subList(1, elements.size()));
-
-            return new LipsObject(newSequence);
+            return new LipsSeq(elements.subList(1, elements.size()));
         });
     }
 
@@ -174,9 +174,7 @@ class Builtin {
                 throw new ArityMismatchException(frame, 1, arguments.size());
             }
 
-            var argument = arguments.get(0).sExpression();
-
-            return new LipsObject(new BooleanLiteral(argument.span(), !argument.asBoolean()));
+            return new LipsBoolean(arguments.get(0).asBoolean());
         });
     }
 
@@ -189,19 +187,19 @@ class Builtin {
             var left = arguments.get(0);
             var right = arguments.get(1);
 
-            List<SExpression> list = new ArrayList<>();
+            List<LipsObject> elements = new ArrayList<>();
 
-            list.add(left);
+            elements.add(left);
 
 
-            if (right instanceof Sequence sequence) {
-                list.addAll(sequence.getElements());
-            } else if (!(right instanceof Nil)) {
+            if (right instanceof LipsSeq seq) {
+                elements.addAll(seq.getElements());
+            } else if (!(right instanceof LipsNil)) {
                 throw new TypeException(frame, "sequence", arguments.get(1));
             }
 
 
-            return new LipsObject(new Sequence(left.span().join(right), list));
+            return new LipsSeq(elements);
         }));
     }
 
@@ -211,14 +209,7 @@ class Builtin {
                 throw new ArityMismatchException(frame, 1, arguments.size());
             }
 
-            var argument = arguments.get(0);
-
-            if (argument instanceof Procedure) {
-                throw new TypeException(frame, "list or atom", "procedure");
-            }
-
-            // TODO: pass valid env
-            return Evaluator.evaluate(frame, new Environment(), argument.sExpression());
+            return arguments.get(0).evaluate(frame, new Environment());
         });
     }
 
@@ -229,12 +220,12 @@ class Builtin {
             }
 
             for (var argument : arguments) {
-                if (!argument.sExpression().asBoolean()) {
-                    return new LipsObject(new BooleanLiteral(new Span(), false));
+                if (!argument.asBoolean()) {
+                    return new LipsBoolean(false);
                 }
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), true));
+            return new LipsBoolean(true);
         }));
     }
 
@@ -245,12 +236,12 @@ class Builtin {
             }
 
             for (var argument : arguments) {
-                if (argument.sExpression().asBoolean()) {
-                    return new LipsObject(new BooleanLiteral(new Span(), true));
+                if (argument.asBoolean()) {
+                    return new LipsBoolean(true);
                 }
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -262,11 +253,11 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (argument.sExpression() instanceof Sequence) {
-                return new LipsObject(new BooleanLiteral(new Span(), true));
+            if (argument instanceof LipsSeq) {
+                return new LipsBoolean(true);
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -278,11 +269,11 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (argument.sExpression() instanceof NumberLiteral) {
-                return new LipsObject(new BooleanLiteral(new Span(), true));
+            if (argument instanceof LipsNumber) {
+                return new LipsBoolean(true);
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -294,11 +285,11 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (argument.sExpression() instanceof BooleanLiteral) {
-                return new LipsObject(new BooleanLiteral(new Span(), true));
+            if (argument instanceof LipsBoolean) {
+                return new LipsBoolean(true);
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -310,11 +301,11 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (argument.sExpression() instanceof Nil) {
-                return new LipsObject(new BooleanLiteral(new Span(), true));
+            if (argument instanceof LipsNil) {
+                return new LipsBoolean(true);
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -326,11 +317,11 @@ class Builtin {
 
             var argument = arguments.get(0);
 
-            if (argument.sExpression() instanceof Symbol) {
-                return new LipsObject(new BooleanLiteral(new Span(), true));
+            if (argument instanceof LipsSymbol) {
+                return new LipsBoolean(true);
             }
 
-            return new LipsObject(new BooleanLiteral(new Span(), false));
+            return new LipsBoolean(false);
         }));
     }
 
@@ -341,10 +332,12 @@ class Builtin {
         scope.put("+", add());
         scope.put("-", sub());
         scope.put("*", times());
+        scope.put("/", divide());
+        scope.put("pow", pow());
         scope.put("=", equal());
         scope.put("not=", notEqual());
-        scope.put("car", car());
-        scope.put("cdr", cdr());
+        scope.put("car", head());
+        scope.put("cdr", tail());
         scope.put("cons", cons());
         scope.put("eval", eval());
         scope.put("and", and());
