@@ -60,7 +60,7 @@ public class Repl {
     }
 
     private static Frame frame(Span span) {
-        return new Frame(span, "<repl>");
+        return new Frame("<repl>");
     }
 
     private Terminal terminal() {

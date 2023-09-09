@@ -186,8 +186,8 @@ class Builtin {
                 throw new ArityMismatchException(frame, 2, arguments.size());
             }
 
-            var left = arguments.get(0).sExpression();
-            var right = arguments.get(1).sExpression();
+            var left = arguments.get(0);
+            var right = arguments.get(1);
 
             List<SExpression> list = new ArrayList<>();
 

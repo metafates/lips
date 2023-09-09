@@ -1,7 +1,6 @@
 package com.inno.lips.core.evaluator;
 
 
-import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.sexpr.Func;
 import com.inno.lips.core.parser.sexpr.Lambda;
 import com.inno.lips.core.parser.sexpr.Parameter;
@@ -15,7 +14,7 @@ public final class Procedure extends LipsObject implements IProcedure {
 
     public Procedure(IProcedure inner) {
         this.inner = inner;
-        this.frame = new Frame(Span.zero(), "<builtin>");
+        this.frame = new Frame("<builtin>");
     }
 
     public Procedure(Frame frame, Environment environment, Lambda lambda) {
@@ -54,7 +53,7 @@ public final class Procedure extends LipsObject implements IProcedure {
     }
 
     public LipsObject apply(Frame frame, List<LipsObject> arguments) throws EvaluationException {
-        return inner.apply(frame.inner(this.frame.getSpan(), this.frame.getScope()), arguments);
+        return inner.apply(frame.inner(this.frame.getScope()), arguments);
     }
 
     @Override

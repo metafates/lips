@@ -1,34 +1,25 @@
 package com.inno.lips.core.evaluator;
 
-import com.inno.lips.core.common.Span;
-
 public class Frame {
     private final Frame parent;
     private final String scope;
-    private final Span span;
 
-    public Frame(Span span, String scope) {
+    public Frame(String scope) {
         this.parent = null;
         this.scope = scope;
-        this.span = span;
     }
 
-    private Frame(Frame parent, Span span, String scope) {
+    private Frame(Frame parent, String scope) {
         this.parent = parent;
         this.scope = scope;
-        this.span = span;
-    }
-
-    public Span getSpan() {
-        return span;
     }
 
     public String getScope() {
         return scope;
     }
 
-    public Frame inner(Span span, String scope) {
-        return new Frame(this, span, scope);
+    public Frame inner(String scope) {
+        return new Frame(this, scope);
     }
 
     public String trace() {

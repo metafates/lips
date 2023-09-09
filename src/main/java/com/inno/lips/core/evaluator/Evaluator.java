@@ -31,7 +31,7 @@ public class Evaluator {
 
         var iter = elements.iterator();
         var toCall = iter.next();
-        var head = evaluate(frame.inner(toCall.span(), "list"), environment, toCall);
+        var head = evaluate(frame.inner("list"), environment, toCall);
 
         if (!(head instanceof Procedure procedure)) {
             throw new NotCallableException(frame);
@@ -41,10 +41,10 @@ public class Evaluator {
 
         while (iter.hasNext()) {
             var next = iter.next();
-            arguments.add(evaluate(frame.inner(next.span(), "list"), environment, next));
+            arguments.add(evaluate(frame.inner("list"), environment, next));
         }
 
-        return procedure.apply(frame.inner(sequence.span(), "call"), arguments);
+        return procedure.apply(frame.inner("call"), arguments);
     }
 
     private static LipsObject evaluateAtom(Frame frame, Environment environment, Atom atom) throws EvaluationException {
@@ -69,12 +69,12 @@ public class Evaluator {
         }
 
         if (specialForm instanceof Lambda lambda) {
-            return new Procedure(frame.inner(lambda.span(), "lambda"), environment.inner(), lambda);
+            return new Procedure(frame.inner("lambda"), environment.inner(), lambda);
         }
 
         if (specialForm instanceof Func func) {
             var identifier = func.getIdentifier();
-            var procedure = new Procedure(frame.inner(func.span(), identifier.getName()), environment.inner(), func);
+            var procedure = new Procedure(frame.inner(identifier.getName()), environment.inner(), func);
             environment.put(func.getIdentifier(), procedure);
 
             return new LipsObject();
@@ -82,7 +82,7 @@ public class Evaluator {
 
         if (specialForm instanceof SetQ setQ) {
             var symbol = setQ.getSymbol();
-            var value = evaluate(frame.inner(symbol.span(), symbol.getName()), environment, setQ.getValue());
+            var value = evaluate(frame.inner(symbol.getName()), environment, setQ.getValue());
             environment.put(symbol, value);
 
             return new LipsObject();
@@ -90,28 +90,28 @@ public class Evaluator {
 
         if (specialForm instanceof If anIf) {
             var predicate = anIf.getPredicate();
-            var condFrame = frame.inner(predicate.span(), "cond");
+            var condFrame = frame.inner("cond");
 
             if (evaluate(condFrame, environment, predicate).sExpression().asBoolean()) {
                 var branch = anIf.getThenBranch();
-                return evaluate(condFrame.inner(branch.span(), "then"), environment, branch);
+                return evaluate(condFrame.inner("then"), environment, branch);
             }
 
             var branch = anIf.getElseBranch();
-            return evaluate(frame.inner(branch.span(), "else"), environment, branch);
+            return evaluate(frame.inner("else"), environment, branch);
         }
 
         if (specialForm instanceof Cond cond) {
             var branches = cond.getBranches();
 
-            var condFrame = frame.inner(cond.span(), "cond");
+            var condFrame = frame.inner("cond");
             for (var branch : branches) {
                 var predicate = branch.predicate();
                 var body = branch.body();
-                var branchFrame = condFrame.inner(predicate.span(), "branch-predicate");
+                var branchFrame = condFrame.inner("branch-predicate");
 
                 if (evaluate(branchFrame, environment, predicate).sExpression().asBoolean()) {
-                    var bodyFrame = branchFrame.inner(body.span(), "branch-body");
+                    var bodyFrame = branchFrame.inner("branch-body");
                     return evaluate(bodyFrame, environment, body);
                 }
             }
@@ -121,7 +121,7 @@ public class Evaluator {
             var predicate = whileForm.getPredicate();
             var body = whileForm.getBody();
 
-            var whileFrame = frame.inner(predicate.span(), "while");
+            var whileFrame = frame.inner("while");
             while (evaluate(whileFrame, environment, predicate).sExpression().asBoolean()) {
                 for (var expression : body) {
                     if (expression instanceof Break) {
@@ -132,7 +132,7 @@ public class Evaluator {
                         return new LipsObject(ret.getValue());
                     }
 
-                    evaluate(whileFrame.inner(expression.span(), "while-body"), environment, expression);
+                    evaluate(whileFrame.inner("while-body"), environment, expression);
                 }
             }
 
@@ -143,11 +143,11 @@ public class Evaluator {
             var bindings = prog.getBindings();
 
             var progEnv = environment.inner();
-            var progFrame = frame.inner(prog.span(), "prog");
+            var progFrame = frame.inner("prog");
 
             for (var binding : bindings) {
                 var name = binding.getName();
-                var value = evaluate(progFrame.inner(binding.span(), name), environment, binding.getValue());
+                var value = evaluate(progFrame.inner(name), environment, binding.getValue());
 
                 progEnv.put(name, value);
             }

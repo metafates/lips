@@ -4,7 +4,7 @@ import com.inno.lips.core.common.Span;
 import com.inno.lips.core.parser.sexpr.Nil;
 import com.inno.lips.core.parser.sexpr.SExpression;
 
-public sealed class LipsObject permits Procedure {
+public sealed class LipsObject permits LipsList, Procedure {
     private final SExpression sExpression;
 
     public LipsObject() {

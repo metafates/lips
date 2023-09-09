@@ -1,6 +1,5 @@
 package com.inno.lips.interpreter;
 
-import com.inno.lips.core.common.Span;
 import com.inno.lips.core.evaluator.Environment;
 import com.inno.lips.core.evaluator.EvaluationException;
 import com.inno.lips.core.evaluator.Evaluator;
@@ -31,8 +30,8 @@ public class Interpreter {
         }
     }
 
-    private static Frame frame(Span span) {
-        return new Frame(span, "<file>");
+    private static Frame frame() {
+        return new Frame("<file>");
     }
 
     public static void interpret(String program) {
@@ -43,7 +42,7 @@ public class Interpreter {
 
             while (tokens.hasNext()) {
                 for (SExpression sExpression : Parser.parse(tokens)) {
-                    Evaluator.evaluate(frame(sExpression.span()), environment, sExpression);
+                    Evaluator.evaluate(frame(), environment, sExpression);
                 }
             }
         } catch (LexingException | ParseException e) {
