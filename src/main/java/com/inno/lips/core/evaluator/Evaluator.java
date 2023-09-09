@@ -15,7 +15,7 @@ public class Evaluator {
             return evaluateSequence(frame, environment, sequence);
         }
 
-        return null;
+        throw new UnsupportedOperationException(frame);
     }
 
     private static LipsObject evaluateSequence(Frame frame, Environment environment, Sequence sequence) throws EvaluationException {
@@ -56,7 +56,7 @@ public class Evaluator {
             return environment.get(frame, symbol);
         }
 
-        return null;
+        throw new UnsupportedOperationException(frame);
     }
 
     private static LipsObject evaluateSpecialForm(Frame frame, Environment environment, SpecialForm specialForm) throws EvaluationException {
@@ -111,6 +111,6 @@ public class Evaluator {
             return new LipsObject();
         }
 
-        return null;
+        throw new UnsupportedOperationException(frame);
     }
 }

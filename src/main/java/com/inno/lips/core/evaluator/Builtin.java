@@ -1,9 +1,10 @@
 package com.inno.lips.core.evaluator;
 
 import com.inno.lips.core.common.Span;
-import com.inno.lips.core.parser.sexpr.*;
+import com.inno.lips.core.parser.sexpr.BooleanLiteral;
+import com.inno.lips.core.parser.sexpr.NumberLiteral;
+import com.inno.lips.core.parser.sexpr.Sequence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 class Builtin {
@@ -16,43 +17,13 @@ class Builtin {
         });
     }
 
-    private static Procedure printf() {
-        return new Procedure((frame, arguments) -> {
-            List<Object> literals = new ArrayList<>();
-
-            if (arguments.isEmpty()) {
-                throw new EvaluationException(frame, "printf expects at least one argument");
-            }
-
-            var iter = arguments.iterator();
-
-            if (!(iter.next().sExpression() instanceof StringLiteral format)) {
-                throw new EvaluationException(frame, "format must be a string");
-            }
-
-            while (iter.hasNext()) {
-                var expr = iter.next().sExpression();
-
-                if (!(expr instanceof Literal<?> literal)) {
-                    throw new EvaluationException(frame, "printf supports literals only");
-                }
-
-                literals.add(literal.getValue());
-            }
-
-            System.out.printf(format.getValue(), literals.toArray());
-            return new LipsObject();
-        });
-    }
-
     private static Procedure add() {
         return new Procedure((frame, arguments) -> {
             float sum = 0;
 
             for (var argument : arguments) {
                 if (!(argument.sExpression() instanceof NumberLiteral numberLiteral)) {
-                    // TODO: better message
-                    throw new EvaluationException(frame, "invalid type");
+                    throw new TypeException(frame, "number", argument);
                 }
 
                 sum += numberLiteral.getValue();
@@ -68,8 +39,7 @@ class Builtin {
 
             for (var argument : arguments) {
                 if (!(argument.sExpression() instanceof NumberLiteral numberLiteral)) {
-                    // TODO: better message
-                    throw new EvaluationException(frame, "invalid type");
+                    throw new TypeException(frame, "number", argument);
                 }
 
                 sum -= numberLiteral.getValue();
@@ -82,7 +52,7 @@ class Builtin {
     private static Procedure equal() {
         return new Procedure((frame, arguments) -> {
             if (arguments.isEmpty()) {
-                throw new EvaluationException(frame, "expects at least 1 argument");
+                throw new ArityMismatchException(frame, 1, 0);
             }
 
             var iter = arguments.iterator();
@@ -118,16 +88,16 @@ class Builtin {
                 throw new EvaluationException(frame, "1 argument expected");
             }
 
-            var argument = arguments.get(0).sExpression();
+            var argument = arguments.get(0);
 
-            if (!(argument instanceof Sequence sequence)) {
-                throw new EvaluationException(frame, "sequence expected");
+            if (!(argument.sExpression() instanceof Sequence sequence)) {
+                throw new TypeException(frame, "sequence", argument);
             }
 
             var elements = sequence.getElements();
 
             if (elements.isEmpty()) {
-                throw new EvaluationException(frame, "at least one element is expected");
+                throw new ArityMismatchException(frame, 1, 0);
             }
 
             return new LipsObject(elements.get(0));
@@ -138,19 +108,19 @@ class Builtin {
         return new Procedure((frame, arguments) -> {
             if (arguments.size() != 1) {
                 // TODO: better message
-                throw new EvaluationException(frame, "1 argument expected");
+                throw new ArityMismatchException(frame, 1, arguments.size());
             }
 
-            var argument = arguments.get(0).sExpression();
+            var argument = arguments.get(0);
 
-            if (!(argument instanceof Sequence sequence)) {
-                throw new EvaluationException(frame, "sequence expected");
+            if (!(argument.sExpression() instanceof Sequence sequence)) {
+                throw new TypeException(frame, "sequence", argument);
             }
 
             var elements = sequence.getElements();
 
             if (elements.isEmpty()) {
-                throw new EvaluationException(frame, "at least one element is expected");
+                throw new ArityMismatchException(frame, 1, 0);
             }
 
             if (elements.size() == 1) {
@@ -166,7 +136,7 @@ class Builtin {
     private static Procedure not() {
         return new Procedure((frame, arguments) -> {
             if (arguments.size() != 1) {
-                throw new EvaluationException(frame, "exactly 1 argument is expected");
+                throw new ArityMismatchException(frame, 1, arguments.size());
             }
 
             var argument = arguments.get(0).sExpression();
@@ -179,7 +149,6 @@ class Builtin {
         var scope = new Environment();
 
         scope.put("println", println());
-        scope.put("printf", printf());
         scope.put("+", add());
         scope.put("-", sub());
         scope.put("=", equal());

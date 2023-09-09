@@ -35,8 +35,7 @@ public final class Procedure extends LipsObject implements IProcedure {
             var givenArity = arguments.size();
 
             if (givenArity < requiredArity || givenArity > requiredArity + defaultsArity) {
-                // TODO: better message
-                throw new EvaluationException(frame, "arity mismatch");
+                throw new ArityMismatchException(frame, requiredArity, givenArity);
             }
 
             for (int i = 0; i < givenArity; i++) {
