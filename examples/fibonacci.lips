@@ -3,6 +3,4 @@
     nil
     (cons a (fibonacci (- n 1) b (+ a b)))))
 
-(func each (f list) (while list (f (car list)) (setq list (cdr list))))
-
-(each println (fibonacci 10))
+(println (fibonacci 10))

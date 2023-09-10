@@ -1,0 +1,16 @@
+(func compose (f g) (lambda (x) (g (f x))))
+
+(func magic (n) (* n 42))
+(func debug (n)
+  (prog ()
+    (println "[DEBUG]" "value" n "type" (type n))
+    n))
+
+(setq compute (compose magic debug))
+
+(setq result (compute 1.5))
+
+(assert (= result 63))
+
+(func each (f list) (while list (f (head list)) (setq list (tail list))))
+(each debug '("one" 3.12 true nil ))

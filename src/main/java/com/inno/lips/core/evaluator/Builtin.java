@@ -245,7 +245,7 @@ class Builtin {
         }));
     }
 
-    public Procedure isList() {
+    private static Procedure isList() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
                 throw new ArityMismatchException(frame, 1, arguments.size());
@@ -261,7 +261,7 @@ class Builtin {
         }));
     }
 
-    public Procedure isNumber() {
+    private static Procedure isNumber() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
                 throw new ArityMismatchException(frame, 1, arguments.size());
@@ -277,7 +277,7 @@ class Builtin {
         }));
     }
 
-    public Procedure isBool() {
+    private static Procedure isBool() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
                 throw new ArityMismatchException(frame, 1, arguments.size());
@@ -293,7 +293,7 @@ class Builtin {
         }));
     }
 
-    public Procedure isNil() {
+    private static Procedure isNil() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
                 throw new ArityMismatchException(frame, 1, arguments.size());
@@ -309,7 +309,7 @@ class Builtin {
         }));
     }
 
-    public Procedure isSymbol() {
+    private static Procedure isSymbol() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
                 throw new ArityMismatchException(frame, 1, arguments.size());
@@ -325,6 +325,45 @@ class Builtin {
         }));
     }
 
+    private static Procedure error() {
+        return new Procedure(((frame, arguments) -> {
+            List<String> strings = arguments.stream().map(String::valueOf).toList();
+            String message = String.join(" ", strings);
+
+            throw new EvaluationException(frame, message);
+        }));
+    }
+
+    private static Procedure assertFunc() {
+        return new Procedure((frame, arguments) -> {
+            if (arguments.isEmpty()) {
+                throw new ArityMismatchException(frame, 1, 0);
+            }
+
+            var iter = arguments.iterator();
+            var assertion = iter.next();
+            List<LipsObject> rest = new ArrayList<>();
+            iter.forEachRemaining(rest::add);
+
+            if (!assertion.asBoolean()) {
+                return error().apply(frame, rest);
+            }
+
+            return LipsNil.instance;
+        });
+    }
+
+    private static Procedure type() {
+        return new Procedure(((frame, arguments) -> {
+            if (arguments.size() != 1) {
+                throw new ArityMismatchException(frame, 1, arguments.size());
+            }
+
+            return new LipsString(arguments.get(0).type());
+        }));
+    }
+
+
     public Environment scope() {
         var scope = new Environment();
 
@@ -336,8 +375,8 @@ class Builtin {
         scope.put("pow", pow());
         scope.put("=", equal());
         scope.put("not=", notEqual());
-        scope.put("car", head());
-        scope.put("cdr", tail());
+        scope.put("head", head());
+        scope.put("tail", tail());
         scope.put("cons", cons());
         scope.put("eval", eval());
         scope.put("and", and());
@@ -347,7 +386,10 @@ class Builtin {
         scope.put("number?", isNumber());
         scope.put("bool?", isBool());
         scope.put("nil?", isNil());
+        scope.put("type", type());
         scope.put("symbol?", isSymbol());
+        scope.put("error", error());
+        scope.put("assert", assertFunc());
 
         return scope;
     }
