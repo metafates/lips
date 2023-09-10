@@ -13,7 +13,10 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class CLI {
     public static void main(String[] args) throws IOException {
         var arguments = new Arguments();
-        var commander = JCommander.newBuilder().addObject(arguments).build();
+        var commander = JCommander
+                .newBuilder()
+                .addObject(arguments)
+                .build();
 
         try {
             commander.parse(args);

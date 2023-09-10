@@ -11,10 +11,7 @@ import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.Parser;
 import com.inno.lips.core.parser.sexpr.SExpression;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.UserInterruptException;
+import org.jline.reader.*;
 import org.jline.reader.impl.DefaultHighlighter;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
@@ -23,19 +20,38 @@ import org.jline.utils.InfoCmp;
 import org.jline.utils.OSUtils;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.fusesource.jansi.Ansi.Color.CYAN;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Repl {
+    private static final String logo = ansi().fg(RED).bold().a("""
+            ⠀⠀⠀⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⢀⣶⠿⠉⠉⠑⠲⠾⠟⡏⢩⠻⣦⣀⠀⠀⠀⠀⠀
+            ⠀⠀⠀⢀⣤⡞⠉⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠃⠙⢿⣄⠀⠀⠀
+            ⠀⠀⢀⠞⠉⠂⠀⠀⡀⢰⣀⣰⣰⣄⣆⠀⠀⠀⠀⠀⠻⣄⡀⠀
+            ⠐⠺⡧⣧⣵⡤⡬⠶⠾⠿⠭⠭⠬⠭⠿⠿⠶⠤⠤⣶⢾⣾⡟⠒
+            ⠀⠀⠹⡏⣟⡌⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠄⠀⠀⢠⣏⡜⠁⠀
+            ⠀⠀⠀⠈⠻⣧⢀⠀⠀⠀⠀⠀⠃⠀⠀⠀⠀⠀⢠⣧⠎⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠙⠓⢬⣄⣀⣀⣆⣀⣤⣠⣴⠶⠛⠁⠀⠀⠀⠀
+            ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠛⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀
+            """).reset().toString();
+
+    private static final String helpMessage = ansi().fg(WHITE).a("""
+            LIPS Repl.
+            Press ctrl-d or ctrl-c to exit.
+            """).reset().toString();
     private final Environment environment;
     private final LineReader reader;
     private final String prompt = ansi().fg(GREEN).a("lips-repl> ").reset().toString();
+    private int lineCounter;
 
     public Repl() throws IOException {
         this.environment = new Environment();
+        this.lineCounter = 1;
 
         Terminal terminal = TerminalBuilder.builder().build();
 
@@ -72,11 +88,25 @@ public class Repl {
         terminal().flush();
     }
 
-    public void loop() {
+    private String readLine() {
+        return reader.readLine(prompt, rightPrompt(), (MaskingCallback) null, null);
+    }
+
+    private String rightPrompt() {
+        var time = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        return ansi().fg(MAGENTA).a(time).toString();
+    }
+
+    public void loop() throws IOException {
+        System.out.println(logo);
+        System.out.println(helpMessage);
+        System.out.println();
+
         while (true) {
             String line;
             try {
-                line = reader.readLine(prompt);
+                line = readLine();
+                lineCounter++;
             } catch (UserInterruptException | EndOfFileException e) {
                 break;
             }
@@ -92,6 +122,10 @@ public class Repl {
 
             try {
                 List<Token> tokens = Lexer.tokenize(line);
+                if (tokens.isEmpty()) {
+                    continue;
+                }
+
                 var sexpr = Parser.parse(tokens.iterator());
 
                 for (SExpression sExpression : sexpr) {
