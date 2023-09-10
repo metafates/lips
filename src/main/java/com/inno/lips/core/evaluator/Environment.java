@@ -6,6 +6,7 @@ import com.inno.lips.core.parser.sexpr.Symbol;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Environment {
     private final static Environment builtin = new Builtin().scope();
@@ -22,8 +23,18 @@ public class Environment {
         this.variables = new HashMap<>();
     }
 
+    public Set<String> namespace() {
+        return variables.keySet();
+    }
+
     public Environment inner() {
         return new Environment(this);
+    }
+
+    public void merge(Environment other) {
+        for (var key : other.variables.keySet()) {
+            put(key, other.variables.get(key));
+        }
     }
 
     public void put(String name, LipsObject value) {
@@ -33,6 +44,7 @@ public class Environment {
     public void put(Symbol symbol, LipsObject value) {
         put(symbol.getName(), value);
     }
+
 
     public LipsObject get(Frame frame, LipsSymbol symbol) throws UndefinedNameException {
         return get(frame, symbol.getName());

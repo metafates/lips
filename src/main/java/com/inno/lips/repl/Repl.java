@@ -11,17 +11,13 @@ import com.inno.lips.core.lexer.Token;
 import com.inno.lips.core.parser.ParseException;
 import com.inno.lips.core.parser.Parser;
 import com.inno.lips.core.parser.sexpr.SExpression;
-import org.jline.reader.*;
-import org.jline.reader.impl.DefaultHighlighter;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.UserInterruptException;
 import org.jline.terminal.Size;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.jline.utils.InfoCmp;
-import org.jline.utils.OSUtils;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -39,18 +35,19 @@ public class Repl {
             ⠀⠀⠀⠀⠀⠀⠙⠓⢬⣄⣀⣀⣆⣀⣤⣠⣴⠶⠛⠁⠀⠀⠀⠀
             ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠙⠛⠋⠉⠁⠀⠀⠀⠀⠀⠀⠀
             """).reset().toString();
-
     private static final String helpMessage = ansi().fg(WHITE).a("""
             LIPS Repl.
+            Write :help to show available commands.
             Press ctrl-d or ctrl-c to exit.
             """).reset().toString();
     private final Environment environment;
     private final LineReader reader;
-    private int lineCounter;
+    private final CommandParser commandParser;
+    private boolean running;
 
     public Repl() throws IOException {
         this.environment = new Environment();
-        this.lineCounter = 1;
+        this.running = false;
 
         Terminal terminal = TerminalBuilder.builder().build();
 
@@ -61,72 +58,35 @@ public class Repl {
         Thread executeThread = Thread.currentThread();
         terminal.handle(Terminal.Signal.INT, signal -> executeThread.interrupt());
 
-        this.reader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .variable(LineReader.SECONDARY_PROMPT_PATTERN, "%M%P > ")
-                .variable(LineReader.INDENTATION, 2)
-                .variable(LineReader.LIST_MAX, 100)
-                .highlighter(new DefaultHighlighter())
-                .build();
+        this.reader = new LineReader(terminal);
 
-        if (OSUtils.IS_WINDOWS) {
-            reader.setVariable(LineReader.BLINK_MATCHING_PAREN, 0);
-        }
+        // TODO: move prefix into registry
+        final String commandPrefix = ":";
+        CommandsRegistry commandsRegistry = new CommandsRegistry();
+        commandsRegistry.put("help", new HelpCommand(commandPrefix, commandsRegistry));
+        commandsRegistry.put("clear", new ClearCommand());
+        commandsRegistry.put("slurp", new SlurpCommand());
+
+        this.commandParser = new CommandParser(commandPrefix, commandsRegistry);
     }
 
     private static Frame frame(Span span) {
         return new Frame("<repl>");
     }
 
-    private Terminal terminal() {
-        return reader.getTerminal();
-    }
-
-    private void clearTerminal() {
-        terminal().puts(InfoCmp.Capability.clear_screen);
-        terminal().flush();
-    }
-
-    private String readLine() {
-        return reader.readLine(leftPrompt(), rightPrompt(), (MaskingCallback) null, null);
-    }
-
-    private String leftPrompt() {
-        return ansi().fg(GREEN).a("[%d]> ".formatted(lineCounter)).reset().toString();
-    }
-
-    private String rightPrompt() {
-        var time = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        return ansi().fg(MAGENTA).a(time).toString();
-    }
-
-    public void loop() throws IOException {
-        System.out.println(logo);
-        System.out.println(helpMessage);
-        System.out.println();
-
-        while (true) {
-            String line;
-            try {
-                line = readLine();
-                lineCounter++;
-            } catch (UserInterruptException | EndOfFileException e) {
-                break;
-            }
-
-            if (line.isBlank()) {
-                continue;
-            }
-
-            if (line.trim().equals(":clear")) {
-                clearTerminal();
-                continue;
+    private void runLine() {
+        try {
+            String line = reader.readLine();
+            if (commandParser.isCommand(line)) {
+                var result = commandParser.parse(line);
+                result.command().execute(reader.terminal(), environment, result.arguments());
+                return;
             }
 
             try {
                 List<Token> tokens = Lexer.tokenize(line);
                 if (tokens.isEmpty()) {
-                    continue;
+                    return;
                 }
 
                 var sexpr = Parser.parse(tokens.iterator());
@@ -142,6 +102,22 @@ public class Repl {
                 System.out.println();
                 System.out.print(e.trace());
             }
+        } catch (EndOfFileException | UserInterruptException e) {
+            this.running = false;
+        } catch (CommandParseException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void loop() throws IOException {
+        System.out.println(logo);
+        System.out.println(helpMessage);
+        System.out.println();
+
+        this.running = true;
+
+        while (running) {
+            runLine();
         }
     }
 }

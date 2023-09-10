@@ -17,24 +17,26 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class Interpreter {
-    public static void interpret(File file) {
+    public static Environment interpret(File file) {
         try (Scanner reader = new Scanner(file)) {
             var builder = new StringBuilder();
             while (reader.hasNextLine()) {
                 builder.append(reader.nextLine());
             }
 
-            interpret(builder.toString());
+            return interpret(builder.toString());
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
+
+        return new Environment();
     }
 
     private static Frame frame() {
         return new Frame("<file>");
     }
 
-    public static void interpret(String program) {
+    public static Environment interpret(String program) {
         var environment = new Environment();
 
         try {
@@ -52,5 +54,7 @@ public class Interpreter {
             System.out.println();
             System.out.print(e.trace());
         }
+
+        return environment;
     }
 }
