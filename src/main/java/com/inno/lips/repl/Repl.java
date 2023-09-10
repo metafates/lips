@@ -46,7 +46,6 @@ public class Repl {
             """).reset().toString();
     private final Environment environment;
     private final LineReader reader;
-    private final String prompt = ansi().fg(GREEN).a("lips-repl> ").reset().toString();
     private int lineCounter;
 
     public Repl() throws IOException {
@@ -89,7 +88,11 @@ public class Repl {
     }
 
     private String readLine() {
-        return reader.readLine(prompt, rightPrompt(), (MaskingCallback) null, null);
+        return reader.readLine(leftPrompt(), rightPrompt(), (MaskingCallback) null, null);
+    }
+
+    private String leftPrompt() {
+        return ansi().fg(GREEN).a("[%d]> ".formatted(lineCounter)).reset().toString();
     }
 
     private String rightPrompt() {
