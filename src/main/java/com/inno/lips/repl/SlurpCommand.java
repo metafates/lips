@@ -1,14 +1,14 @@
 package com.inno.lips.repl;
 
 import com.inno.lips.core.evaluator.Environment;
+import com.inno.lips.core.evaluator.Frame;
 import com.inno.lips.interpreter.Interpreter;
 import org.jline.terminal.Terminal;
 
 import java.io.File;
 import java.util.List;
 
-import static org.fusesource.jansi.Ansi.Color.CYAN;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.*;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public final class SlurpCommand extends Command {
@@ -35,8 +35,21 @@ public final class SlurpCommand extends Command {
         Environment newEnv = Interpreter.interpret(file);
 
         for (var key : newEnv.namespace()) {
-            String message = ansi().fg(GREEN).bold().a("+").fg(CYAN).a(key).reset().toString();
-            System.out.println(message);
+            try {
+                String message = ansi()
+                        .fg(GREEN)
+                        .bold()
+                        .a("+ ")
+                        .fg(CYAN)
+                        .a(key)
+                        .fg(YELLOW)
+                        .a(" " + newEnv.get(new Frame("slurp"), key).type())
+                        .reset()
+                        .toString();
+                System.out.println(message);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
 
         environment.merge(newEnv);

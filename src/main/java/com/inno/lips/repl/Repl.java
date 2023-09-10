@@ -80,6 +80,7 @@ public class Repl {
             if (commandParser.isCommand(line)) {
                 var result = commandParser.parse(line);
                 result.command().execute(reader.terminal(), environment, result.arguments());
+                System.out.println();
                 return;
             }
 
@@ -102,6 +103,7 @@ public class Repl {
                 System.out.println();
                 System.out.print(e.trace());
             }
+            System.out.println();
         } catch (EndOfFileException | UserInterruptException e) {
             this.running = false;
         } catch (CommandParseException e) {
