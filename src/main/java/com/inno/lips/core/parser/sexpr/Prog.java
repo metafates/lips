@@ -47,13 +47,13 @@ public final class Prog extends SpecialForm {
         return "Prog(%s -> %s)".formatted(bindings.AST(), String.join(", ", strings));
     }
 
-    public static class Binding extends Spannable implements Node {
+    public static class Binding implements Spannable, Node {
+        private final Span span;
         private final String name;
         private final SExpression value;
 
         private Binding(Span span, String name, SExpression value) {
-            super(span);
-
+            this.span = span;
             this.name = name;
             this.value = value;
         }
@@ -73,6 +73,10 @@ public final class Prog extends SpecialForm {
             return new Binding(span, symbol.getName(), elements.get(1));
         }
 
+        public Span span() {
+            return span;
+        }
+
         public String getName() {
             return name;
         }
@@ -87,12 +91,17 @@ public final class Prog extends SpecialForm {
         }
     }
 
-    public static class Bindings extends Spannable implements Node {
+    public static class Bindings implements Spannable, Node {
+        private final Span span;
         private final Map<String, Binding> map;
 
         private Bindings(Span span) {
-            super(span);
+            this.span = span;
             this.map = new HashMap<>();
+        }
+
+        public Span span() {
+            return this.span;
         }
 
         public static Bindings parse(SExpression sExpression) throws ParseException {

@@ -8,22 +8,19 @@ import com.inno.lips.core.parser.SpecialFormArityMismatchException;
 
 import java.util.List;
 
-public class Parameter extends Spannable implements Node {
+public class Parameter implements Spannable, Node {
+    private final Span span;
     private final String name;
     private final Literal<?> defaultValue;
 
-    public Parameter(Span span, String name) {
-        super(span);
-
-        this.name = name;
-        this.defaultValue = null;
-    }
-
     public Parameter(Span span, String name, Literal<?> defaultValue) {
-        super(span);
-
+        this.span = span;
         this.name = name;
         this.defaultValue = defaultValue;
+    }
+
+    public Parameter(Span span, String name) {
+        this(span, name, null);
     }
 
     public static Parameter parse(SExpression sExpression) throws ParseException {
@@ -60,6 +57,10 @@ public class Parameter extends Spannable implements Node {
         }
 
         throw new InvalidSyntaxException(sExpression.span(), "invalid parameter");
+    }
+
+    public Span span() {
+        return span;
     }
 
     public String getName() {
