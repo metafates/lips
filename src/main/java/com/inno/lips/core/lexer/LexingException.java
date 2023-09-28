@@ -9,4 +9,3 @@ public class LexingException extends SpannedException {
     }
 
 }
-

@@ -4,14 +4,14 @@ import com.inno.lips.core.common.Span;
 import com.inno.lips.core.common.Spannable;
 
 public class Token implements Spannable {
-    private final Span span;
     private final TokenType type;
     private final String source;
+    private final Span span;
 
     public Token(TokenType type, String source, Span span) {
-        this.span = span;
         this.type = type;
         this.source = source;
+        this.span = span;
     }
 
     public TokenType type() {

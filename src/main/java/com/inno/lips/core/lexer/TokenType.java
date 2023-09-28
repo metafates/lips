@@ -3,10 +3,7 @@ package com.inno.lips.core.lexer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.util.regex.Pattern.compile;
 
 public enum TokenType {
     OPEN_PAREN("("),
@@ -22,14 +19,13 @@ public enum TokenType {
     RETURN("return"),
     BREAK("break"),
     NIL("nil"),
-    COMMENT(compile(";[^\n]*")),
-    BLANK(compile("\\s")),
-    QUOTE_TICK(compile("'")),
-    BOOLEAN_LITERAL(compile("false|true")),
-    NUMBER_LITERAL(compile("[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE]\\d+)?")),
-    STRING_LITERAL(compile("\"([^\"\\\\]|\\\\t|\\\\u|\\\\n|\\\\r|\\\\\")*\"")),
-    IDENTIFIER(compile("[A-Za-z+\\-.><?=*][A-Za-z\\d\\-.><?=*]*")); // TODO
-
+    COMMENT(Pattern.compile("^;[^\n]*\n?$")),
+    WHITESPACE(Pattern.compile("\\s")),
+    QUOTE_TICK("'"),
+    BOOLEAN_LITERAL(Pattern.compile("false|true")),
+    NUMBER_LITERAL(Pattern.compile("[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE]\\d+)?")),
+    STRING_LITERAL(Pattern.compile("\"([^\"\\\\]|\\\\t|\\\\u|\\\\n|\\\\r|\\\\\")*\"")),
+    IDENTIFIER(Pattern.compile("[A-Za-z+\\-.><?=*][A-Za-z\\d\\-.><?=*]*")); // TODO
 
     private static final HashSet<TokenType> specials = new HashSet<>(List.of(new TokenType[]{
             SETQ,
@@ -56,32 +52,24 @@ public enum TokenType {
         this.exactPattern = pattern;
     }
 
-    public static Optional<TokenType> matchPattern(String string) {
+    public static Optional<TokenType> match(String string) {
         for (TokenType tt : TokenType.values()) {
-            if (tt.exactPattern != null) {
-                if (string.equals(tt.exactPattern)) {
-                    return Optional.of(tt);
-                }
-
-                // in this case, regex pattern will be null;
-                continue;
-            }
-
-            Matcher matcher = tt.pattern.matcher(string);
-
-            if (matcher.matches()) {
+            if (tt.matches(string)) {
                 return Optional.of(tt);
             }
         }
-
         return Optional.empty();
-    }
-
-    public static boolean matchesAny(String string) {
-        return TokenType.matchPattern(string).isPresent();
     }
 
     public boolean isSpecial() {
         return specials.contains(this);
+    }
+
+    public boolean matches(String s) {
+        if (exactPattern != null) {
+            return s.equals(exactPattern);
+        }
+        assert pattern != null;
+        return pattern.matcher(s).matches();
     }
 }
