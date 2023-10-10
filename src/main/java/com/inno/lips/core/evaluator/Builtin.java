@@ -87,6 +87,39 @@ class Builtin {
         });
     }
 
+    private static Procedure sin() {
+        return numericOp(1, nums -> {
+            var iter = nums.iterator();
+            var res = iter.next();
+
+            res = (float) (Math.sin(res));
+
+            return res;
+        });
+    }
+
+    private static Procedure cos() {
+        return numericOp(1, nums -> {
+            var iter = nums.iterator();
+            var res = iter.next();
+
+            res = (float) (Math.cos(res));
+
+            return res;
+        });
+    }
+
+    private static Procedure tan() {
+        return numericOp(1, nums -> {
+            var iter = nums.iterator();
+            var res = iter.next();
+
+            res = (float) (Math.tan(res));
+
+            return res;
+        });
+    }
+
     private static Procedure equal() {
         return new Procedure((frame, arguments) -> {
             if (arguments.isEmpty()) {
@@ -390,6 +423,9 @@ class Builtin {
         scope.put("symbol?", isSymbol());
         scope.put("error", error());
         scope.put("assert", assertFunc());
+        scope.put("sin", sin());
+        scope.put("cos", cos());
+        scope.put("tan", tan());
 
         return scope;
     }
