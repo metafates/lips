@@ -1,9 +1,5 @@
-package com.inno.lips.interpreter;
+package com.inno.lips.core.inspector;
 
-import com.inno.lips.core.evaluator.Environment;
-import com.inno.lips.core.evaluator.EvaluationException;
-import com.inno.lips.core.evaluator.Evaluator;
-import com.inno.lips.core.evaluator.Frame;
 import com.inno.lips.core.lexer.Lexer;
 import com.inno.lips.core.lexer.LexingException;
 import com.inno.lips.core.lexer.Token;
@@ -13,48 +9,36 @@ import com.inno.lips.core.parser.sexpr.SExpression;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Scanner;
 
-public class Interpreter {
-    public static Environment interpret(File file) {
+public class Inspector {
+    public static void AST(File file) throws IOException {
         try (Scanner reader = new Scanner(file)) {
             var builder = new StringBuilder();
             while (reader.hasNextLine()) {
                 builder.append(reader.nextLine());
             }
 
-            return interpret(builder.toString());
+            AST(builder.toString());
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
-
-        return new Environment();
     }
 
-    private static Frame frame() {
-        return new Frame("<file>");
-    }
-
-    public static Environment interpret(String program) {
-        var environment = new Environment();
-
+    public static void AST(String string) {
         try {
-            Iterator<Token> tokens = Lexer.tokenize(program).iterator();
+            Iterator<Token> tokens = Lexer.tokenize(string).iterator();
 
             while (tokens.hasNext()) {
                 for (SExpression sExpression : Parser.parse(tokens)) {
-                    Evaluator.evaluate(frame(), environment, sExpression);
+                    System.out.println(sExpression.AST());
                 }
             }
         } catch (LexingException | ParseException e) {
             System.out.println();
-            System.err.print(e.show(program));
-        } catch (EvaluationException e) {
-            System.out.println();
-            System.out.print(e.trace());
+            System.err.print(e.show(string));
         }
-
-        return environment;
     }
 }

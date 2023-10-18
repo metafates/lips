@@ -32,7 +32,7 @@ public final class SlurpCommand extends Command {
         var path = arguments.get(0);
         var file = new File(path);
 
-        Environment newEnv = Interpreter.interpret(file, false);
+        Environment newEnv = Interpreter.interpret(file);
 
         for (var key : newEnv.namespace()) {
             try {

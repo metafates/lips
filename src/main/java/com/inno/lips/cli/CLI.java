@@ -2,6 +2,7 @@ package com.inno.lips.cli;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.inno.lips.core.inspector.Inspector;
 import com.inno.lips.interpreter.Interpreter;
 import com.inno.lips.repl.Repl;
 
@@ -31,7 +32,11 @@ public class CLI {
         }
 
         if (arguments.file != null) {
-            Interpreter.interpret(arguments.file, arguments.ast);
+            if (arguments.ast) {
+                Inspector.AST(arguments.file);
+                return;
+            }
+            Interpreter.interpret(arguments.file);
             return;
         }
 
