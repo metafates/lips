@@ -6,36 +6,24 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class Span {
     private final int start;
     private final int end;
-    private final boolean virtual;
 
     public Span(int start, int end) {
         this.start = start;
         this.end = end;
-        this.virtual = false;
     }
 
     public Span(int position) {
         this.start = position;
         this.end = position;
-        this.virtual = false;
     }
 
     public Span() {
-        this.virtual = true;
         this.start = -1;
         this.end = -1;
     }
 
     public static Span zero() {
         return new Span(0, 0);
-    }
-
-    public boolean isVirtual() {
-        return virtual;
-    }
-
-    public boolean isSingle() {
-        return start == end;
     }
 
     public int getStart() {
@@ -92,10 +80,6 @@ public class Span {
 
     @Override
     public String toString() {
-        if (isSingle()) {
-            return String.valueOf(start);
-        }
-
         return "%d..%d".formatted(start, end);
     }
 }
