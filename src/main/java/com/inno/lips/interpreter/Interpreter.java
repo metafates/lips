@@ -17,14 +17,14 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class Interpreter {
-    public static Environment interpret(File file) {
+    public static Environment interpret(File file, boolean printAST) {
         try (Scanner reader = new Scanner(file)) {
             var builder = new StringBuilder();
             while (reader.hasNextLine()) {
                 builder.append(reader.nextLine());
             }
 
-            return interpret(builder.toString());
+            return interpret(builder.toString(), printAST);
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
@@ -36,7 +36,7 @@ public class Interpreter {
         return new Frame("<file>");
     }
 
-    public static Environment interpret(String program) {
+    public static Environment interpret(String program, boolean printAST) {
         var environment = new Environment();
 
         try {
@@ -44,6 +44,10 @@ public class Interpreter {
 
             while (tokens.hasNext()) {
                 for (SExpression sExpression : Parser.parse(tokens)) {
+                    if (printAST) {
+                        System.out.println(sExpression.AST());
+                    }
+
                     Evaluator.evaluate(frame(), environment, sExpression);
                 }
             }

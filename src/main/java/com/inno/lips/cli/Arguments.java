@@ -11,4 +11,7 @@ class Arguments {
 
     @Parameter(names = {"-h", "--help"}, description = "Show help", help = true)
     boolean help;
+
+    @Parameter(names = {"--ast"}, description = "Print AST")
+    boolean ast;
 }

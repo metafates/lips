@@ -3,4 +3,3 @@
     nil
     (cons a (fibonacci (- n 1) b (+ a b)))))
 
-(println (fibonacci 10))

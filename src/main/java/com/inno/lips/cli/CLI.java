@@ -31,7 +31,7 @@ public class CLI {
         }
 
         if (arguments.file != null) {
-            Interpreter.interpret(arguments.file);
+            Interpreter.interpret(arguments.file, arguments.ast);
             return;
         }
 
