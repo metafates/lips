@@ -13,20 +13,19 @@ import com.inno.lips.core.parser.sexpr.SExpression;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.Scanner;
 
 public class Interpreter {
     public static Environment interpret(File file) {
-        try (Scanner reader = new Scanner(file)) {
-            var builder = new StringBuilder();
-            while (reader.hasNextLine()) {
-                builder.append(reader.nextLine());
-            }
-
-            return interpret(builder.toString());
+        try {
+            String src = Files.readString(file.toPath());
+            return interpret(src);
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return new Environment();
