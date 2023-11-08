@@ -35,6 +35,12 @@ public final class Cond extends SpecialForm {
         return branches;
     }
 
+    public String AST() {
+        List<String> strings = branches.stream().map(Branch::AST).toList();
+
+        return "Cond(%s)".formatted(String.join(", ", strings));
+    }
+
     public record Branch(SExpression predicate, SExpression body) {
         public static Branch parse(SExpression sExpression) throws ParseException {
             if (!(sExpression instanceof Sequence sequence)) {
@@ -48,6 +54,10 @@ public final class Cond extends SpecialForm {
             }
 
             return new Branch(elements.get(0), elements.get(1));
+        }
+
+        public String AST() {
+            return "Branch(%s, %s)".formatted(predicate, body);
         }
     }
 }
