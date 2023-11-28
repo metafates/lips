@@ -20,7 +20,7 @@ public enum TokenType {
     BREAK("break"),
     NIL("nil"),
     COMMENT(Pattern.compile("^;[^\n]*\n?$")),
-    WHITESPACE(Pattern.compile("\\s")),
+    WHITESPACE(Pattern.compile("\\s+")),
     QUOTE_TICK("'"),
     BOOLEAN_LITERAL(Pattern.compile("false|true")),
     NUMBER_LITERAL(Pattern.compile("[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE]\\d+)?")),
