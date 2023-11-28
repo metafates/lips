@@ -17,7 +17,7 @@ public final class LipsSpecial extends LipsObject {
     }
 
     @Override
-    public LipsObject evaluate(Frame frame, Environment environment) throws EvaluationException {
+        public LipsObject evaluate(Frame frame, Environment environment) throws EvaluationException {
         if (specialForm instanceof Quote quote) {
             return LipsObjectFactory.create(quote.getBody());
         }

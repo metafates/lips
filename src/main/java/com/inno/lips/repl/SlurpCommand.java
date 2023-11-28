@@ -6,6 +6,7 @@ import com.inno.lips.interpreter.Interpreter;
 import org.jline.terminal.Terminal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import static org.fusesource.jansi.Ansi.Color.*;
@@ -23,7 +24,7 @@ public final class SlurpCommand extends Command {
     }
 
     @Override
-    public void execute(Terminal terminal, Environment environment, List<String> arguments) {
+    public void execute(Terminal terminal, Environment environment, List<String> arguments) throws IOException {
         if (arguments.isEmpty()) {
             System.out.println("path is expected");
             return;

@@ -65,16 +65,11 @@ public class SExpressionFactory {
             case CLOSE_PAREN -> throw new InvalidSyntaxException(current.span(), "Unexpected closing parenthesis");
             default -> {
                 Atom atom = AtomFactory.create(current);
-
-                if (atom.getType() != TokenType.QUOTE_TICK) {
-                    yield atom;
-                }
+                if (atom.getType() != TokenType.QUOTE_TICK) yield atom;
 
                 Symbol quote = new Symbol(current.span(), TokenType.QUOTE, "quote");
 
-                if (!rest.hasNext()) {
-                    throw new UnexpectedEOFException(quote.span());
-                }
+                if (!rest.hasNext()) throw new UnexpectedEOFException(quote.span());
 
                 var next = rest.next();
                 SExpression toQuote = create(next.span(), next, rest, true);

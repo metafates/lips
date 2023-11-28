@@ -106,12 +106,12 @@ public class Repl {
             System.out.println();
         } catch (EndOfFileException | UserInterruptException e) {
             this.running = false;
-        } catch (CommandParseException e) {
+        } catch (CommandParseException | IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void loop() throws IOException {
+    public void loop() {
         System.out.println(logo);
         System.out.println(helpMessage);
         System.out.println();
