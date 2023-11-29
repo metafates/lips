@@ -226,6 +226,27 @@ class Builtin {
         });
     }
 
+    private static Procedure xor() {
+        return new Procedure(((frame, arguments) -> {
+            if (arguments.size() != 2) {
+                throw new ArityMismatchException(frame, 2, arguments.size());
+            }
+
+            var left = arguments.get(0);
+            var right = arguments.get(1);
+
+            if (!(left instanceof LipsBoolean leftBool)) {
+                throw new TypeException(frame, "boolean", left);
+            }
+
+            if (!(right instanceof LipsBoolean rightBool)) {
+                throw new TypeException(frame, "boolean", right);
+            }
+
+            return new LipsBoolean(leftBool.getValue() ^ rightBool.getValue());
+        }));
+    }
+
     private static Procedure cons() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 2) {
@@ -411,7 +432,6 @@ class Builtin {
         }));
     }
 
-
     public Environment scope() {
         var scope = new Environment();
 
@@ -460,6 +480,7 @@ class Builtin {
         scope.put("and", and());
         scope.put("or", or());
         scope.put("not", not());
+        scope.put("xor", xor());
 
         // Evaluator.
         scope.put("eval", eval());
