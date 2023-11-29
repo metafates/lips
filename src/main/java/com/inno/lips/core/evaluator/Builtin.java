@@ -401,11 +401,20 @@ class Builtin {
         var scope = new Environment();
 
         scope.put("println", println());
+
         scope.put("+", add());
         scope.put("-", sub());
         scope.put("*", times());
         scope.put("/", divide());
+        scope.put("plus", add());
+        scope.put("minus", sub());
+        scope.put("times", times());
+        scope.put("divide", divide());
         scope.put("pow", pow());
+        scope.put("sin", sin());
+        scope.put("cos", cos());
+        scope.put("tan", tan());
+
         scope.put("=", equal());
         scope.put("not=", notEqual());
         scope.put("head", head());
@@ -423,9 +432,6 @@ class Builtin {
         scope.put("symbol?", isSymbol());
         scope.put("error", error());
         scope.put("assert", assertFunc());
-        scope.put("sin", sin());
-        scope.put("cos", cos());
-        scope.put("tan", tan());
 
         return scope;
     }
