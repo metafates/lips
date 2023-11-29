@@ -25,7 +25,7 @@ public enum TokenType {
     BOOLEAN_LITERAL(Pattern.compile("false|true")),
     NUMBER_LITERAL(Pattern.compile("[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE]\\d+)?")),
     STRING_LITERAL(Pattern.compile("\"([^\"\\\\]|\\\\t|\\\\u|\\\\n|\\\\r|\\\\\")*\"")),
-    IDENTIFIER(Pattern.compile("[A-Za-z+\\-.><?=*][A-Za-z\\d\\-.><?=*]*")); // TODO
+    IDENTIFIER(Pattern.compile("[A-Za-z+\\-.><?=*/][A-Za-z\\d\\-.><?=*/]*")); // TODO
 
     private static final HashSet<TokenType> specials = new HashSet<>(List.of(new TokenType[]{
             SETQ,
