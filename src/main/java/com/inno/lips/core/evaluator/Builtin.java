@@ -222,7 +222,7 @@ class Builtin {
                 throw new ArityMismatchException(frame, 1, arguments.size());
             }
 
-            return new LipsBoolean(arguments.get(0).asBoolean());
+            return new LipsBoolean(!arguments.get(0).asBoolean());
         });
     }
 
