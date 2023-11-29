@@ -4,6 +4,7 @@ import com.inno.lips.core.evaluator.object.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 class Builtin {
@@ -120,35 +121,49 @@ class Builtin {
         });
     }
 
-    private static Procedure equal() {
+    private static Procedure comparisonOp(BiFunction<Float, Float, Boolean> op) {
         return new Procedure((frame, arguments) -> {
-            if (arguments.isEmpty()) {
-                throw new ArityMismatchException(frame, 1, 0);
+            if (arguments.size() != 2) {
+                throw new ArityMismatchException(frame, 2, arguments.size());
             }
 
-            var iter = arguments.iterator();
+            var left = arguments.get(0);
+            var right = arguments.get(1);
 
-            var prev = iter.next();
-
-            while (iter.hasNext()) {
-                var current = iter.next();
-
-                if (!prev.equals(current)) {
-                    return new LipsBoolean(false);
-                }
-
-                prev = current;
+            if (!(left instanceof LipsNumber leftNum)) {
+                throw new TypeException(frame, "number", left);
             }
 
-            return new LipsBoolean(true);
+            if (!(right instanceof LipsNumber rightNum)) {
+                throw new TypeException(frame, "number", right);
+            }
+
+            return new LipsBoolean(op.apply(leftNum.getValue(), rightNum.getValue()));
         });
     }
 
+    private static Procedure equal() {
+        return comparisonOp(Float::equals);
+    }
+
     private static Procedure notEqual() {
-        return new Procedure((frame, arguments) -> {
-            var res = (LipsBoolean) equal().apply(frame, arguments);
-            return res.inversed();
-        });
+        return comparisonOp((left, right) -> !left.equals(right));
+    }
+
+    private static Procedure less() {
+        return comparisonOp((left, right) -> left < right);
+    }
+
+    private static Procedure lessOrEqual() {
+        return comparisonOp((left, right) -> left <= right);
+    }
+
+    private static Procedure greater() {
+        return comparisonOp((left, right) -> left > right);
+    }
+
+    private static Procedure greaterOrEqual() {
+        return comparisonOp((left, right) -> left >= right);
     }
 
     private static Procedure head() {
@@ -422,6 +437,16 @@ class Builtin {
         // Comparison operators.
         scope.put("=", equal());
         scope.put("not=", notEqual());
+        scope.put("<", less());
+        scope.put("<=", lessOrEqual());
+        scope.put(">", greater());
+        scope.put(">=", greaterOrEqual());
+        scope.put("equal", equal());
+        scope.put("notequal", notEqual());
+        scope.put("less", less());
+        scope.put("lesseq", lessOrEqual());
+        scope.put("greater", greater());
+        scope.put("greatereq", greaterOrEqual());
 
         // Type predicates.
         scope.put("number?", isNumber());
