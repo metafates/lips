@@ -400,8 +400,7 @@ class Builtin {
     public Environment scope() {
         var scope = new Environment();
 
-        scope.put("println", println());
-
+        // Math.
         scope.put("+", add());
         scope.put("-", sub());
         scope.put("*", times());
@@ -415,21 +414,33 @@ class Builtin {
         scope.put("cos", cos());
         scope.put("tan", tan());
 
-        scope.put("=", equal());
-        scope.put("not=", notEqual());
+        // Operations on lists.
         scope.put("head", head());
         scope.put("tail", tail());
         scope.put("cons", cons());
-        scope.put("eval", eval());
-        scope.put("and", and());
-        scope.put("not", not());
-        scope.put("or", or());
-        scope.put("list?", isList());
+
+        // Comparison operators.
+        scope.put("=", equal());
+        scope.put("not=", notEqual());
+
+        // Type predicates.
         scope.put("number?", isNumber());
         scope.put("bool?", isBool());
         scope.put("nil?", isNil());
-        scope.put("type", type());
+        scope.put("list?", isList());
         scope.put("symbol?", isSymbol());
+        scope.put("type", type());
+
+        // Logical operators.
+        scope.put("and", and());
+        scope.put("or", or());
+        scope.put("not", not());
+
+        // Evaluator.
+        scope.put("eval", eval());
+
+        // Extra.
+        scope.put("println", println());
         scope.put("error", error());
         scope.put("assert", assertFunc());
 
