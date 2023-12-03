@@ -378,6 +378,22 @@ class Builtin {
         }));
     }
 
+    private static Procedure isAtom() {
+        return new Procedure((frame, arguments) -> {
+            if (arguments.size() != 1) {
+                throw new ArityMismatchException(frame, 1, arguments.size());
+            }
+
+            var argument = arguments.get(0);
+
+            if (argument instanceof LipsSeq || argument instanceof LipsSpecial) {
+                return new LipsBoolean(false);
+            }
+
+            return new LipsBoolean(true);
+        });
+    }
+
     private static Procedure isSymbol() {
         return new Procedure(((frame, arguments) -> {
             if (arguments.size() != 1) {
@@ -474,6 +490,7 @@ class Builtin {
         scope.put("nil?", isNil());
         scope.put("list?", isList());
         scope.put("symbol?", isSymbol());
+        scope.put("atom?", isAtom());
         scope.put("type", type());
 
         // Logical operators.
