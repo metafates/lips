@@ -18,6 +18,8 @@ public enum TokenType {
     QUOTE("quote"),
     RETURN("return"),
     BREAK("break"),
+    AND("and"),
+    OR("or"),
     NIL("nil"),
     COMMENT(Pattern.compile("^;[^\n]*\n?$")),
     WHITESPACE(Pattern.compile("\\s+")),
@@ -38,6 +40,8 @@ public enum TokenType {
             IF,
             BREAK,
             QUOTE,
+            AND,
+            OR,
     }));
     private final Pattern pattern;
     private final String exactPattern;

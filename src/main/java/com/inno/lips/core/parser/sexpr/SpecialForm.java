@@ -4,7 +4,7 @@ import com.inno.lips.core.common.Span;
 
 import java.util.List;
 
-public abstract sealed class SpecialForm extends Sequence permits Break, Cond, Func, If, Lambda, Prog, Quote, Return, SetQ, While {
+public abstract sealed class SpecialForm extends Sequence permits Break, Logic, Cond, Func, If, Lambda, Prog, Quote, Return, SetQ, While {
     public SpecialForm(Span span) {
         super(span);
     }

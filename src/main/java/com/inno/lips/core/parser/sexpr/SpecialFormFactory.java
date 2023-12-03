@@ -32,6 +32,7 @@ public class SpecialFormFactory {
             case IF -> If.parse(span, arguments);
             case COND -> Cond.parse(span, arguments);
             case PROG -> Prog.parse(span, arguments);
+            case AND, OR -> Logic.parse(span, symbol, arguments);
             default -> throw new NotImplementedException("not implemented");
         };
     }

@@ -17,7 +17,7 @@ public final class LipsSpecial extends LipsObject {
     }
 
     @Override
-        public LipsObject evaluate(Frame frame, Environment environment) throws EvaluationException {
+    public LipsObject evaluate(Frame frame, Environment environment) throws EvaluationException {
         if (specialForm instanceof Quote quote) {
             return LipsObjectFactory.create(quote.getBody());
         }
@@ -70,6 +70,48 @@ public final class LipsSpecial extends LipsObject {
                     return body.evaluate(bodyFrame, environment);
                 }
             }
+        }
+
+        if (specialForm instanceof And and) {
+            var args = and.getArgs();
+            var andFrame = frame.inner("and");
+
+            var head = args.get(0);
+            var tail = args.subList(1, args.size());
+
+            var prev = LipsObjectFactory.create(head).evaluate(andFrame, environment);
+            for (var arg : tail) {
+                if (!prev.asBoolean()) {
+                    return prev;
+                }
+
+                prev = LipsObjectFactory
+                        .create(arg)
+                        .evaluate(andFrame, environment);
+            }
+
+            return prev;
+        }
+
+        if (specialForm instanceof Or or) {
+            var args = or.getArgs();
+            var orFrame = frame.inner("and");
+
+            var head = args.get(0);
+            var tail = args.subList(1, args.size());
+
+            var prev = LipsObjectFactory.create(head).evaluate(orFrame, environment);
+            for (var arg : tail) {
+                if (prev.asBoolean()) {
+                    return prev;
+                }
+
+                prev = LipsObjectFactory
+                        .create(arg)
+                        .evaluate(orFrame, environment);
+            }
+
+            return prev;
         }
 
         if (specialForm instanceof While whileForm) {
