@@ -1,0 +1,11 @@
+(func map (fn lst)
+  (cond
+    ((not lst) nil)
+    (true (cons (fn (head lst)) (map fn (tail lst))))))
+
+(setq numbers '(1 2 3 4 5))
+(func square (x) (* x x))
+
+(setq squared-numbers (map square numbers))
+
+(println squared-numbers)
