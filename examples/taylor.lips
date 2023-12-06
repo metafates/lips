@@ -1,0 +1,20 @@
+(func factorial (n)
+  (if (= n 0) 1 (* n (factorial (- n 1)))))
+
+(func cos-approximation (iterations x) (prog ((iteration 0) (result 0))
+  (while (< iteration iterations)
+    (setq result (+ result (* 
+      (pow x (* 2 iteration))
+      (/
+        (pow -1 iteration)
+        (factorial (* 2 iteration))))))
+    (setq iteration (+ iteration 1))
+    (println "iteration" iteration "result" result))
+    result))
+
+(println "approximation")
+(println (cos-approximation 6 1))
+
+(println)
+
+(println "real" (cos 1))
